@@ -4,7 +4,7 @@
  */
 
 /** Where the download button points. Kept here because it changes per deploy. */
-export const APK_URL = 'https://saji-app-ten.vercel.app/Saji.apk';
+export const APK_URL = 'https://drive.google.com/uc?export=download&id=1CxwTrPBFyhL2xa3b8YA_5KtlTD6LtU8k';
 
 /** Shown next to the button so nobody starts a 22MB download blind. */
 export const APK_SIZE = '22 ميغابايت';

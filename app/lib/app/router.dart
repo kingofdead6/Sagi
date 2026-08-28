@@ -19,7 +19,6 @@ import 'package:saji/features/home/presentation/customer_shell.dart';
 import 'package:saji/features/orders/presentation/order_detail_screen.dart';
 import 'package:saji/features/profile/presentation/address_edit_screen.dart';
 import 'package:saji/features/profile/presentation/addresses_screen.dart';
-import 'package:saji/features/profile/presentation/language_screen.dart';
 import 'package:saji/features/profile/presentation/notifications_screen.dart';
 import 'package:saji/features/portal/presentation/portal_screen.dart';
 import 'package:saji/features/profile/presentation/vouchers_screen.dart';
@@ -131,7 +130,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: Routes.notifications,
         builder: (_, __) => const NotificationsScreen(),
       ),
-      GoRoute(path: Routes.language, builder: (_, __) => const LanguageScreen()),
       GoRoute(
         path: Routes.addressEdit,
         builder: (_, state) => AddressEditScreen(addressId: state.uri.queryParameters['id']),

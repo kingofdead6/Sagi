@@ -48,6 +48,10 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
   bool _loaded = false;
   bool _saving = false;
 
+  /// Field name -> message, for whichever values were rejected. Filled by
+  /// [_validate] and again from the server's own validation response.
+  Map<String, String> _errors = const {};
+
   @override
   void dispose() {
     for (final controller in [
@@ -88,16 +92,50 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
 
   void _close() => ref.read(editingVendorIdProvider.notifier).state = null;
 
-  Future<void> _save() async {
+  /// Mirrors the server's own rules so a bad value is named here rather than
+  /// coming back as one opaque "invalid data" message.
+  Map<String, String> _validate() {
     final l10n = context.l10n;
-    if (_name.text.trim().isEmpty || _slug.text.trim().isEmpty || _categoryId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.errorValidation)),
-      );
+    final errors = <String, String>{};
+
+    if (_name.text.trim().length < 2) errors['name'] = l10n.adminInvalidName;
+    if (_categoryId == null) errors['category'] = l10n.adminInvalidCategory;
+
+    final slug = _slug.text.trim().toLowerCase();
+    if (slug.length < 2) {
+      errors['slug'] = l10n.adminInvalidSlug;
+    } else if (!RegExp(r'^[a-z0-9-]+$').hasMatch(slug)) {
+      // The server enforces the same shape; say so before the round trip.
+      errors['slug'] = l10n.adminInvalidSlugChars;
+    }
+
+    if (_phone.text.trim().length < 6) errors['phone'] = l10n.adminInvalidPhone;
+    if (_addressText.text.trim().length < 3) errors['addressText'] = l10n.adminInvalidAddress;
+
+    for (final entry in {
+      'deliveryFeeCentimes': _deliveryFee,
+      'minOrderCentimes': _minOrder,
+      'prepTimeMin': _prepMin,
+      'prepTimeMax': _prepMax,
+    }.entries) {
+      final value = num.tryParse(entry.value.text.trim());
+      if (value == null || value < 0) errors[entry.key] = l10n.adminInvalidNumber;
+    }
+
+    return errors;
+  }
+
+  Future<void> _save() async {
+    final errors = _validate();
+    if (errors.isNotEmpty) {
+      setState(() => _errors = errors);
       return;
     }
 
-    setState(() => _saving = true);
+    setState(() {
+      _errors = const {};
+      _saving = true;
+    });
     final result = await ref.read(adminRepositoryProvider).saveVendor(
       {
         'name': _name.text.trim(),
@@ -114,8 +152,10 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
         'minOrderCentimes': Money.fromDinars(num.tryParse(_minOrder.text.trim()) ?? 0).centimes,
         'prepTimeMin': int.tryParse(_prepMin.text.trim()) ?? 15,
         'prepTimeMax': int.tryParse(_prepMax.text.trim()) ?? 30,
-        'logo': _logo?.toJson(),
-        'cover': _cover?.toJson(),
+        // Only send an image key when there is one: the create schema is
+        // strict and an explicit null is not the same as "not provided".
+        if (_logo != null) 'logo': _logo!.toJson(),
+        if (_cover != null) 'cover': _cover!.toJson(),
         'isOpen': _isOpen,
         'isFeatured': _isFeatured,
       },
@@ -130,6 +170,9 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
         ref.invalidate(adminVendorsProvider);
         _close();
       case Err(:final failure):
+        // The API names the offending fields; show them on the inputs rather
+        // than collapsing everything into one unhelpful toast.
+        setState(() => _errors = failure.fieldErrors);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.failureMessage(failure))),
         );
@@ -177,11 +220,16 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AdminField(label: l10n.adminVendorName, controller: _name),
+            AdminField(
+              label: l10n.adminVendorName,
+              controller: _name,
+              errorText: _errors['name'],
+            ),
             AdminField(
               label: l10n.adminVendorSlug,
               controller: _slug,
               hint: 'el-assala',
+              errorText: _errors['slug'],
             ),
             AdminField(
               label: l10n.adminVendorDescription,
@@ -207,7 +255,10 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
               child: DropdownButtonFormField<String?>(
                 initialValue: _categoryId,
                 style: AppText.adminTable,
-                decoration: InputDecoration(labelText: l10n.filterCategory),
+                decoration: InputDecoration(
+                  labelText: l10n.filterCategory,
+                  errorText: _errors['category'],
+                ),
                 items: [
                   for (final category in categories)
                     DropdownMenuItem(value: category.id, child: Text(category.nameAr)),
@@ -219,8 +270,13 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
               label: l10n.adminVendorPhone,
               controller: _phone,
               keyboardType: TextInputType.phone,
+              errorText: _errors['phone'],
             ),
-            AdminField(label: l10n.adminVendorAddress, controller: _addressText),
+            AdminField(
+              label: l10n.adminVendorAddress,
+              controller: _addressText,
+              errorText: _errors['addressText'],
+            ),
 
             Text(l10n.adminVendorLocation, style: AppText.adminTableHead),
             Gap.sm,
@@ -253,6 +309,7 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
                     label: l10n.checkoutDeliveryFee,
                     controller: _deliveryFee,
                     keyboardType: TextInputType.number,
+                    errorText: _errors['deliveryFeeCentimes'],
                   ),
                 ),
                 Gap.wMd,
@@ -261,6 +318,7 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
                     label: l10n.adminVoucherMinOrder,
                     controller: _minOrder,
                     keyboardType: TextInputType.number,
+                    errorText: _errors['minOrderCentimes'],
                   ),
                 ),
               ],
@@ -272,6 +330,7 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
                     label: l10n.adminVendorPrepTime,
                     controller: _prepMin,
                     keyboardType: TextInputType.number,
+                    errorText: _errors['prepTimeMin'],
                   ),
                 ),
                 Gap.wMd,
@@ -280,6 +339,7 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
                     label: l10n.adminVendorPrepTime,
                     controller: _prepMax,
                     keyboardType: TextInputType.number,
+                    errorText: _errors['prepTimeMax'],
                   ),
                 ),
               ],

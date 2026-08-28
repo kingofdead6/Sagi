@@ -145,76 +145,71 @@ final adminProductsProvider = FutureProvider.autoDispose<Paged<Product>>((ref) a
 class AdminProductsPage extends ConsumerWidget {
   const AdminProductsPage({super.key});
 
+  /// Below this the sections panel cannot sit beside the list without starving
+  /// both, so it moves into an end drawer reached from the toolbar.
+  static const _sidePanelBreakpoint = 900.0;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final products = ref.watch(adminProductsProvider);
     final vendors = ref.watch(adminVendorsProvider).valueOrNull;
     final vendorId = ref.watch(adminProductVendorProvider);
+    final isWide = MediaQuery.sizeOf(context).width >= _sidePanelBreakpoint;
 
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 260,
-                      child: DropdownButtonFormField<String?>(
-                        initialValue: vendorId,
-                        style: AppText.adminTable,
-                        decoration: InputDecoration(labelText: l10n.adminVendors),
-                        items: [
-                          DropdownMenuItem(value: null, child: Text(l10n.filterAll)),
-                          for (final vendor in vendors?.items ?? const <Vendor>[])
-                            DropdownMenuItem(value: vendor.id, child: Text(vendor.name)),
-                        ],
-                        onChanged: (value) =>
-                            ref.read(adminProductVendorProvider.notifier).state = value,
-                      ),
-                    ),
-                    const Spacer(),
-                    FilledButton.icon(
-                      onPressed: () => _editProduct(context, ref, null, vendorId),
-                      icon: const Icon(Icons.add_rounded, size: 18),
-                      label: Text(l10n.adminProductNew),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: products.when(
-                  loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (error, _) => ErrorRetry(
-                    failure: error is Failure ? error : const Failure.unknown(),
-                    onRetry: () => ref.invalidate(adminProductsProvider),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      // Only offer the drawer when there is a vendor whose sections to show.
+      endDrawer: (!isWide && vendorId != null)
+          ? Drawer(child: SafeArea(child: _SectionsPanel(vendorId: vendorId, inDrawer: true)))
+          : null,
+      body: Row(
+        children: [
+          Expanded(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: _ProductsToolbar(
+                    isWide: isWide,
+                    vendorId: vendorId,
+                    vendors: vendors?.items ?? const <Vendor>[],
+                    onVendorChanged: (value) =>
+                        ref.read(adminProductVendorProvider.notifier).state = value,
+                    onNewProduct: () => _editProduct(context, ref, null, vendorId),
                   ),
-                  data: (page) {
-                    if (page.isEmpty) {
-                      return EmptyState(
-                        title: l10n.emptyTitle,
-                        icon: Icons.inventory_2_outlined,
-                        actionLabel: l10n.adminProductNew,
-                        onAction: () => _editProduct(context, ref, null, vendorId),
-                      );
-                    }
-                    // Reordering only makes sense within one vendor's menu.
-                    return _ProductList(
-                      products: page.items,
-                      canReorder: vendorId != null,
-                      onEdit: (product) => _editProduct(context, ref, product, vendorId),
-                    );
-                  },
                 ),
-              ),
-            ],
+                Expanded(
+                  child: products.when(
+                    loading: () => const Center(child: CircularProgressIndicator()),
+                    error: (error, _) => ErrorRetry(
+                      failure: error is Failure ? error : const Failure.unknown(),
+                      onRetry: () => ref.invalidate(adminProductsProvider),
+                    ),
+                    data: (page) {
+                      if (page.isEmpty) {
+                        return EmptyState(
+                          title: l10n.emptyTitle,
+                          icon: Icons.inventory_2_outlined,
+                          actionLabel: l10n.adminProductNew,
+                          onAction: () => _editProduct(context, ref, null, vendorId),
+                        );
+                      }
+                      // Reordering only makes sense within one vendor's menu.
+                      return _ProductList(
+                        products: page.items,
+                        canReorder: vendorId != null,
+                        onEdit: (product) => _editProduct(context, ref, product, vendorId),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        if (vendorId != null) _SectionsPanel(vendorId: vendorId),
-      ],
+          if (isWide && vendorId != null) _SectionsPanel(vendorId: vendorId),
+        ],
+      ),
     );
   }
 
@@ -344,10 +339,89 @@ class _ProductListState extends ConsumerState<_ProductList> {
 
 /// Menu sections for the selected vendor: create, delete, and see how the menu
 /// is grouped on the customer side.
+/// The products toolbar. On a wide window the vendor filter and the new-product
+/// button sit on one line; on a phone they stack, and a menu button opens the
+/// sections drawer.
+class _ProductsToolbar extends StatelessWidget {
+  const _ProductsToolbar({
+    required this.isWide,
+    required this.vendorId,
+    required this.vendors,
+    required this.onVendorChanged,
+    required this.onNewProduct,
+  });
+
+  final bool isWide;
+  final String? vendorId;
+  final List<Vendor> vendors;
+  final ValueChanged<String?> onVendorChanged;
+  final VoidCallback onNewProduct;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
+    final filter = DropdownButtonFormField<String?>(
+      initialValue: vendorId,
+      isExpanded: true,
+      style: AppText.adminTable,
+      decoration: InputDecoration(labelText: l10n.adminVendors),
+      items: [
+        DropdownMenuItem(value: null, child: Text(l10n.filterAll)),
+        for (final vendor in vendors)
+          DropdownMenuItem(value: vendor.id, child: Text(vendor.name)),
+      ],
+      onChanged: onVendorChanged,
+    );
+
+    final addButton = FilledButton.icon(
+      onPressed: onNewProduct,
+      icon: const Icon(Icons.add_rounded, size: 18),
+      label: Text(l10n.adminProductNew),
+    );
+
+    if (isWide) {
+      return Row(
+        children: [
+          SizedBox(width: 260, child: filter),
+          const Spacer(),
+          addButton,
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(child: filter),
+            if (vendorId != null) ...[
+              Gap.wSm,
+              IconButton(
+                tooltip: l10n.portalSections,
+                icon: const Icon(Icons.menu_rounded),
+                // Opens the sections panel that the wide layout shows inline.
+                onPressed: () => Scaffold.of(context).openEndDrawer(),
+              ),
+            ],
+          ],
+        ),
+        Gap.sm,
+        addButton,
+      ],
+    );
+  }
+}
+
 class _SectionsPanel extends ConsumerWidget {
-  const _SectionsPanel({required this.vendorId});
+  const _SectionsPanel({required this.vendorId, this.inDrawer = false});
 
   final String vendorId;
+
+  /// In a drawer the panel fills the sheet instead of taking a fixed column,
+  /// and drops the divider that separated it from the list.
+  final bool inDrawer;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -355,11 +429,13 @@ class _SectionsPanel extends ConsumerWidget {
     final sections = ref.watch(adminSectionsProvider(vendorId));
 
     return SizedBox(
-      width: 300,
+      width: inDrawer ? null : 300,
       child: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.adminSurface,
-          border: Border(right: BorderSide(color: AppColors.adminBorder)),
+          border: inDrawer
+              ? null
+              : const Border(right: BorderSide(color: AppColors.adminBorder)),
         ),
         child: Column(
           children: [

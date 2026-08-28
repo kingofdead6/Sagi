@@ -1350,4 +1350,25 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get adminVendorAccountRevoke => 'حذف الحساب';
+
+  @override
+  String get adminInvalidName => 'الاسم يجب أن يكون حرفين على الأقل';
+
+  @override
+  String get adminInvalidCategory => 'اختر فئة للمتجر';
+
+  @override
+  String get adminInvalidSlug => 'المعرّف يجب أن يكون حرفين على الأقل';
+
+  @override
+  String get adminInvalidSlugChars => 'حروف لاتينية صغيرة وأرقام وشرطات فقط';
+
+  @override
+  String get adminInvalidPhone => 'رقم هاتف غير صالح';
+
+  @override
+  String get adminInvalidAddress => 'العنوان قصير جداً';
+
+  @override
+  String get adminInvalidNumber => 'أدخل رقماً صحيحاً';
 }

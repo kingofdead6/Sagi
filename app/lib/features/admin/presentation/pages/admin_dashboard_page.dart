@@ -30,11 +30,21 @@ class AdminDashboardPage extends ConsumerWidget {
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final columns = constraints.maxWidth > 1200
-                        ? 5
-                        : constraints.maxWidth > 800
-                            ? 3
-                            : 2;
+                    // Size the grid from a card's minimum readable width rather
+                    // than fixed breakpoints: on a phone that yields a single
+                    // column instead of two squashed ones.
+                    const minCardWidth = 190.0;
+                    final columns = (constraints.maxWidth / minCardWidth)
+                        .floor()
+                        .clamp(1, 5);
+
+                    // A lone card in a narrow column would be absurdly tall at
+                    // the desktop ratio, so flatten it as the count drops.
+                    final aspectRatio = switch (columns) {
+                      1 => 3.4,
+                      2 => 2.2,
+                      _ => 1.9,
+                    };
                     final data = stats.valueOrNull;
 
                     return GridView.count(
@@ -43,7 +53,7 @@ class AdminDashboardPage extends ConsumerWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       mainAxisSpacing: AppSpacing.md,
                       crossAxisSpacing: AppSpacing.md,
-                      childAspectRatio: 1.9,
+                      childAspectRatio: aspectRatio,
                       children: [
                         StatCard(
                           label: l10n.adminStatTodayOrders,

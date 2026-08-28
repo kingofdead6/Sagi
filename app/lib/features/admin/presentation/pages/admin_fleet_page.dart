@@ -27,8 +27,13 @@ class AdminFleetPage extends ConsumerStatefulWidget {
 class _AdminFleetPageState extends ConsumerState<AdminFleetPage> {
   String? _selectedAgentId;
 
+  /// Below this the agent list cannot sit beside the map, so it becomes a
+  /// drawer opened from a floating button.
+  static const _listBreakpoint = 900.0;
+
   @override
   Widget build(BuildContext context) {
+    final isWide = MediaQuery.sizeOf(context).width >= _listBreakpoint;
     final l10n = context.l10n;
     final fleet = ref.watch(fleetProvider);
 
@@ -47,91 +52,111 @@ class _AdminFleetPageState extends ConsumerState<AdminFleetPage> {
             ? LocationService.fallbackCenter
             : located.first.location!;
 
-        return Row(
-          children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  SajiMap(
-                    center: center,
-                    zoom: 13,
-                    pins: [
-                      for (final agent in located)
-                        MapPin(
-                          point: agent.location!,
-                          icon: Icons.delivery_dining_rounded,
-                          color: agent.isOnDelivery
-                              ? AppColors.primaryGreen
-                              : AppColors.textMuted,
-                          label: agent.fullName,
-                          onTap: () => setState(() => _selectedAgentId = agent.agentId),
-                        ),
-                    ],
+        final agentList = Container(
+          decoration: BoxDecoration(
+            color: AppColors.adminSurface,
+            border: isWide
+                ? const Border(right: BorderSide(color: AppColors.adminBorder))
+                : null,
+          ),
+          child: agents.isEmpty
+              ? EmptyState(
+                  title: l10n.adminFleetEmpty,
+                  icon: Icons.delivery_dining_outlined,
+                )
+              : ListView(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  children: [
+                    for (final agent in agents)
+                      _AgentCard(
+                        agent: agent,
+                        isSelected: agent.agentId == selected?.agentId,
+                        onTap: () {
+                          setState(() => _selectedAgentId = agent.agentId);
+                          // Picking an agent in the drawer should reveal them
+                          // on the map, so close it on the way out.
+                          if (!isWide) Navigator.of(context).maybePop();
+                        },
+                      ),
+                  ],
+                ),
+        );
+
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          endDrawer: isWide ? null : Drawer(child: SafeArea(child: agentList)),
+          floatingActionButton: isWide
+              ? null
+              : Builder(
+                  builder: (context) => FloatingActionButton(
+                    backgroundColor: AppColors.adminAccent,
+                    foregroundColor: Colors.white,
+                    onPressed: () => Scaffold.of(context).openEndDrawer(),
+                    child: const Icon(Icons.menu_rounded),
                   ),
-                  if (agents.isEmpty)
-                    Center(
+                ),
+          body: Row(
+            children: [
+              Expanded(
+                child: Stack(
+                  children: [
+                    SajiMap(
+                      center: center,
+                      zoom: 13,
+                      pins: [
+                        for (final agent in located)
+                          MapPin(
+                            point: agent.location!,
+                            icon: Icons.delivery_dining_rounded,
+                            color: agent.isOnDelivery
+                                ? AppColors.primaryGreen
+                                : AppColors.textMuted,
+                            label: agent.fullName,
+                            onTap: () => setState(() => _selectedAgentId = agent.agentId),
+                          ),
+                      ],
+                    ),
+                    if (agents.isEmpty)
+                      Center(
+                        child: Container(
+                          padding: const EdgeInsets.all(AppSpacing.lg),
+                          decoration: const BoxDecoration(
+                            color: AppColors.adminSurface,
+                            borderRadius: AppRadius.smallBorder,
+                            boxShadow: AppShadows.card,
+                          ),
+                          child: Text(l10n.adminFleetEmpty, style: AppText.adminTable),
+                        ),
+                      ),
+                    PositionedDirectional(
+                      top: AppSpacing.lg,
+                      start: AppSpacing.lg,
                       child: Container(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                          vertical: AppSpacing.sm,
+                        ),
                         decoration: const BoxDecoration(
                           color: AppColors.adminSurface,
                           borderRadius: AppRadius.smallBorder,
                           boxShadow: AppShadows.card,
                         ),
-                        child: Text(l10n.adminFleetEmpty, style: AppText.adminTable),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _Legend(color: AppColors.primaryGreen, label: l10n.adminFleetOnDelivery),
+                            Gap.wMd,
+                            _Legend(color: AppColors.textMuted, label: l10n.adminFleetIdle),
+                          ],
+                        ),
                       ),
                     ),
-                  PositionedDirectional(
-                    top: AppSpacing.lg,
-                    start: AppSpacing.lg,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                        vertical: AppSpacing.sm,
-                      ),
-                      decoration: const BoxDecoration(
-                        color: AppColors.adminSurface,
-                        borderRadius: AppRadius.smallBorder,
-                        boxShadow: AppShadows.card,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _Legend(color: AppColors.primaryGreen, label: l10n.adminFleetOnDelivery),
-                          Gap.wMd,
-                          _Legend(color: AppColors.textMuted, label: l10n.adminFleetIdle),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              width: 320,
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: AppColors.adminSurface,
-                  border: Border(right: BorderSide(color: AppColors.adminBorder)),
+                  ],
                 ),
-                child: agents.isEmpty
-                    ? EmptyState(
-                        title: l10n.adminFleetEmpty,
-                        icon: Icons.delivery_dining_outlined,
-                      )
-                    : ListView(
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        children: [
-                          for (final agent in agents)
-                            _AgentCard(
-                              agent: agent,
-                              isSelected: agent.agentId == selected?.agentId,
-                              onTap: () => setState(() => _selectedAgentId = agent.agentId),
-                            ),
-                        ],
-                      ),
               ),
-            ),
-          ],
+              if (isWide) SizedBox(width: 320, child: agentList),
+            ],
+          ),
         );
       },
     );

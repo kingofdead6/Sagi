@@ -578,5 +578,12 @@
   "adminVendorAccountExists": "Ce commerce a un identifiant",
   "adminVendorAccountNone": "Aucun identifiant",
   "adminVendorAccountHint": "Le propriétaire gère uniquement son menu",
-  "adminVendorAccountRevoke": "Supprimer l'identifiant"
+  "adminVendorAccountRevoke": "Supprimer l'identifiant",
+  "adminInvalidName": "Le nom doit faire au moins 2 caractères",
+  "adminInvalidCategory": "Choisissez une catégorie",
+  "adminInvalidSlug": "L'identifiant doit faire au moins 2 caractères",
+  "adminInvalidSlugChars": "Minuscules latines, chiffres et tirets uniquement",
+  "adminInvalidPhone": "Numéro invalide",
+  "adminInvalidAddress": "Adresse trop courte",
+  "adminInvalidNumber": "Entrez un nombre valide"
 }

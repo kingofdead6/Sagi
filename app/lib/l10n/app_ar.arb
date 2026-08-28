@@ -578,5 +578,12 @@
   "adminVendorAccountExists": "لهذا المتجر حساب دخول",
   "adminVendorAccountNone": "لا يوجد حساب دخول",
   "adminVendorAccountHint": "يدخل صاحب المتجر ليدير قائمته فقط",
-  "adminVendorAccountRevoke": "حذف الحساب"
+  "adminVendorAccountRevoke": "حذف الحساب",
+  "adminInvalidName": "الاسم يجب أن يكون حرفين على الأقل",
+  "adminInvalidCategory": "اختر فئة للمتجر",
+  "adminInvalidSlug": "المعرّف يجب أن يكون حرفين على الأقل",
+  "adminInvalidSlugChars": "حروف لاتينية صغيرة وأرقام وشرطات فقط",
+  "adminInvalidPhone": "رقم هاتف غير صالح",
+  "adminInvalidAddress": "العنوان قصير جداً",
+  "adminInvalidNumber": "أدخل رقماً صحيحاً"
 }

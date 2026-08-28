@@ -2691,6 +2691,48 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'حذف الحساب'**
   String get adminVendorAccountRevoke;
+
+  /// No description provided for @adminInvalidName.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاسم يجب أن يكون حرفين على الأقل'**
+  String get adminInvalidName;
+
+  /// No description provided for @adminInvalidCategory.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر فئة للمتجر'**
+  String get adminInvalidCategory;
+
+  /// No description provided for @adminInvalidSlug.
+  ///
+  /// In ar, this message translates to:
+  /// **'المعرّف يجب أن يكون حرفين على الأقل'**
+  String get adminInvalidSlug;
+
+  /// No description provided for @adminInvalidSlugChars.
+  ///
+  /// In ar, this message translates to:
+  /// **'حروف لاتينية صغيرة وأرقام وشرطات فقط'**
+  String get adminInvalidSlugChars;
+
+  /// No description provided for @adminInvalidPhone.
+  ///
+  /// In ar, this message translates to:
+  /// **'رقم هاتف غير صالح'**
+  String get adminInvalidPhone;
+
+  /// No description provided for @adminInvalidAddress.
+  ///
+  /// In ar, this message translates to:
+  /// **'العنوان قصير جداً'**
+  String get adminInvalidAddress;
+
+  /// No description provided for @adminInvalidNumber.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدخل رقماً صحيحاً'**
+  String get adminInvalidNumber;
 }
 
 class _AppLocalizationsDelegate

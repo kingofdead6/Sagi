@@ -28,7 +28,9 @@ class StatCard extends StatelessWidget {
         borderRadius: AppRadius.smallBorder,
         border: Border.all(color: AppColors.adminBorder),
       ),
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.all(AppSpacing.md),
+      // The grid fixes each tile's height, so on a short tile the value line
+      // must give way rather than overflow.
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -55,8 +57,14 @@ class StatCard extends StatelessWidget {
               ),
             ],
           ),
-          Gap.md,
-          Text(value, style: AppText.adminStat, maxLines: 1, overflow: TextOverflow.ellipsis),
+          Gap.sm,
+          Flexible(
+            child: FittedBox(
+              alignment: AlignmentDirectional.centerStart,
+              fit: BoxFit.scaleDown,
+              child: Text(value, style: AppText.adminStat, maxLines: 1),
+            ),
+          ),
           if (hint != null)
             Text(
               hint!,
@@ -373,10 +381,15 @@ class AdminField extends StatelessWidget {
     this.keyboardType,
     this.maxLines = 1,
     this.enabled = true,
+    this.errorText,
   });
 
   final String label;
   final TextEditingController controller;
+
+  /// Shown under the field, in red, when this specific value was rejected —
+  /// either by the form or by the server's validation response.
+  final String? errorText;
   final String? hint;
   final TextInputType? keyboardType;
   final int maxLines;
@@ -397,7 +410,7 @@ class AdminField extends StatelessWidget {
             maxLines: maxLines,
             enabled: enabled,
             style: AppText.adminTable,
-            decoration: InputDecoration(hintText: hint),
+            decoration: InputDecoration(hintText: hint, errorText: errorText),
           ),
         ],
       ),

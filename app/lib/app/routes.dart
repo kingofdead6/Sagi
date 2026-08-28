@@ -25,7 +25,6 @@ abstract final class Routes {
   static const addressEdit = '/addresses/edit';
   static const vouchers = '/vouchers';
   static const notifications = '/notifications';
-  static const language = '/language';
 
   // agent
   static const agentHome = '/agent';

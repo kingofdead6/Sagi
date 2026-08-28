@@ -578,5 +578,12 @@
   "adminVendorAccountExists": "This store has a login",
   "adminVendorAccountNone": "No login yet",
   "adminVendorAccountHint": "The owner signs in to manage their menu only",
-  "adminVendorAccountRevoke": "Remove login"
+  "adminVendorAccountRevoke": "Remove login",
+  "adminInvalidName": "Name must be at least 2 characters",
+  "adminInvalidCategory": "Choose a category",
+  "adminInvalidSlug": "Slug must be at least 2 characters",
+  "adminInvalidSlugChars": "Lowercase latin letters, digits and dashes only",
+  "adminInvalidPhone": "Invalid phone number",
+  "adminInvalidAddress": "Address is too short",
+  "adminInvalidNumber": "Enter a valid number"
 }

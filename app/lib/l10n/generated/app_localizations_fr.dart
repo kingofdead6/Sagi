@@ -1354,4 +1354,27 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get adminVendorAccountRevoke => 'Supprimer l\'identifiant';
+
+  @override
+  String get adminInvalidName => 'Le nom doit faire au moins 2 caractères';
+
+  @override
+  String get adminInvalidCategory => 'Choisissez une catégorie';
+
+  @override
+  String get adminInvalidSlug =>
+      'L\'identifiant doit faire au moins 2 caractères';
+
+  @override
+  String get adminInvalidSlugChars =>
+      'Minuscules latines, chiffres et tirets uniquement';
+
+  @override
+  String get adminInvalidPhone => 'Numéro invalide';
+
+  @override
+  String get adminInvalidAddress => 'Adresse trop courte';
+
+  @override
+  String get adminInvalidNumber => 'Entrez un nombre valide';
 }

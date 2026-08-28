@@ -6,7 +6,6 @@ import 'package:saji/app/theme/spacing.dart';
 import 'package:saji/app/theme/text_styles.dart';
 import 'package:saji/app/theme/tokens.dart';
 import 'package:saji/core/l10n_ext.dart';
-import 'package:saji/features/profile/presentation/settings_controller.dart';
 import 'package:saji/core/phone.dart';
 import 'package:saji/features/auth/presentation/auth_controller.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -114,15 +113,6 @@ class ProfileScreen extends ConsumerWidget {
                 icon: Icons.notifications_none_rounded,
                 label: l10n.profileNotifications,
                 onTap: () => context.push(Routes.notifications),
-              ),
-              _Tile(
-                icon: Icons.language_rounded,
-                label: l10n.profileLanguage,
-                trailing: Text(
-                  ref.watch(localeControllerProvider.notifier).language.label,
-                  style: AppText.meta,
-                ),
-                onTap: () => context.push(Routes.language),
               ),
               _Tile(
                 icon: Icons.headset_mic_outlined,

@@ -1,0 +1,6 @@
+node_modules/
+dist/
+
+# The APK is a build artifact copied from app/build — not source.
+# Regenerate it with: npm run sync:apk
+public/download/*.apk

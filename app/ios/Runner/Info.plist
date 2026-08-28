@@ -66,5 +66,27 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>نحتاج موقعك لتحديد عنوان التوصيل وعرض المتاجر القريبة منك.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>يحتاج تطبيق السائق إلى الموقع في الخلفية لتتبّع التوصيل أثناء الطريق.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>لاختيار صورة للملف الشخصي أو للمنتجات.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>لالتقاط صورة للملف الشخصي أو للمنتجات.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tel</string>
+		<string>comgooglemaps</string>
+		<string>waze</string>
+	</array>
+	<key>CFBundleDisplayName</key>
+	<string>ساجي</string>
 </dict>
 </plist>

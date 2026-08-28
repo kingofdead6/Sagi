@@ -90,34 +90,43 @@ export async function priceOrder(customerId: string, input: QuoteInput): Promise
     pointsBalance = user?.points ?? 0;
   }
 
-  const result = computePricing(
-    {
-      id: String(vendor._id),
-      deliveryFeeCentimes: vendor.deliveryFeeCentimes,
-      minOrderCentimes: vendor.minOrderCentimes,
-    },
-    productsById,
-    {
-      lines: input.items.map((i) => ({
-        productId: i.productId,
-        qty: i.qty,
-        optionValueIds: i.optionValueIds ?? [],
-      })),
-      deliveryType: input.deliveryType,
-      voucher: voucher ? { code: voucher.code, type: voucher.type, value: voucher.value } : null,
-      pointsToUse: input.pointsToUse,
-      pointsBalance,
-    },
-    settings,
-  );
+  const pricingVendor = {
+    id: String(vendor._id),
+    deliveryFeeCentimes: vendor.deliveryFeeCentimes,
+    minOrderCentimes: vendor.minOrderCentimes,
+  };
 
-  // A voucher with a minimum the basket misses is reported, not silently applied.
+  const lines = input.items.map((i) => ({
+    productId: i.productId,
+    qty: i.qty,
+    optionValueIds: i.optionValueIds ?? [],
+  }));
+
+  const price = (applyVoucher: boolean) =>
+    computePricing(
+      pricingVendor,
+      productsById,
+      {
+        lines,
+        deliveryType: input.deliveryType,
+        voucher:
+          applyVoucher && voucher
+            ? { code: voucher.code, type: voucher.type, value: voucher.value }
+            : null,
+        pointsToUse: input.pointsToUse,
+        pointsBalance,
+      },
+      settings,
+    );
+
+  let result = price(true);
+
+  // A voucher whose minimum the basket misses is reported, not silently
+  // applied — the checkout screen shows the warning next to the breakdown.
   if (voucher && result.subtotalCentimes < voucher.minOrderCentimes) {
     warnings.push('قيمة الطلب أقل من الحد الأدنى للقسيمة');
-    return {
-      ...(await priceOrder(customerId, { ...input, voucherCode: undefined })),
-      warnings: [...warnings],
-    };
+    voucher = null;
+    result = price(false);
   }
 
   const orderItems: OrderItem[] = result.items.map((i) => ({

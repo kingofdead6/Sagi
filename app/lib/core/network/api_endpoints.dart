@@ -1,13 +1,21 @@
+import 'package:flutter/foundation.dart';
+
 /// Every server path in one place. The base URL is configured at build time:
 /// `flutter run --dart-define=SAJI_API_URL=http://10.0.2.2:4000`
 abstract final class Api {
-  static const baseUrl = String.fromEnvironment(
-    'SAJI_API_URL',
-    defaultValue: 'http://10.0.2.2:4000',
-  );
+  static const _configured = String.fromEnvironment('SAJI_API_URL');
+
+  /// Falls back to a sensible local default per platform: `localhost` for the
+  /// admin dashboard in a browser, and the Android emulator's host alias for
+  /// the mobile surfaces.
+  static final baseUrl = _configured.isNotEmpty
+      ? _configured
+      : kIsWeb
+          ? 'http://localhost:4000'
+          : 'http://10.0.2.2:4000';
 
   static const prefix = '/api/v1';
-  static const socketUrl = baseUrl;
+  static String get socketUrl => baseUrl;
 
   // auth
   static const register = '$prefix/auth/register';

@@ -7,7 +7,7 @@ import { Vendor } from '../vendors/vendor.model';
 import { ApiError } from '../../utils/ApiError';
 import { distanceKm, fromGeoPoint, point } from '../../utils/geo';
 import { realtime } from '../../realtime/emitter';
-import { ORDER_POPULATE, releaseAssignment } from '../orders/order.service';
+import { acceptAssignment, ORDER_POPULATE, releaseAssignment } from '../orders/order.service';
 import { getSettings } from '../settings/settings.service';
 import { buildPage, skipFor } from '../../utils/pagination';
 import { logger } from '../../config/logger';
@@ -72,7 +72,6 @@ export async function respondToOffer(
   accept: boolean,
   reason?: string,
 ) {
-  const { acceptAssignment } = await import('../orders/order.service');
   if (accept) {
     const order = await acceptAssignment(orderId, agentId);
     return (await Order.findById(order._id).populate(ORDER_POPULATE))!.toJSON();

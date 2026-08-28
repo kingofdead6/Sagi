@@ -492,45 +492,57 @@ async function seed() {
 
     const confirmedAt = flow.indexOf(status) >= 1 ? new Date(createdAt.getTime() + 4 * 60_000) : null;
 
-    return Order.create({
-      code: generateOrderCode(),
-      customer: customer._id,
-      vendor: assala._id,
-      status,
-      deliveryType: customerIndex === 1 ? 'vip' : 'normal',
-      paymentMethod: 'cash',
-      address: {
-        label: address.label,
-        wilaya: address.wilaya,
-        commune: address.commune,
-        street: address.street,
-        notes: address.notes,
-      },
-      deliveryLocation: address.location,
-      customerNote: customerIndex === 0 ? 'اتصل بي عند الوصول من فضلك' : undefined,
-      items,
-      subtotalCentimes: subtotal,
-      serviceFeeCentimes: settings.serviceFeeCentimes,
-      deliveryFeeCentimes: assala.deliveryFeeCentimes,
-      discountCentimes: 0,
-      pointsUsed: 0,
-      pointsEarned: Math.floor(subtotal / 10_000),
-      totalCentimes: total,
-      agent: agentIndex !== null ? agents[agentIndex]!._id : null,
-      confirmedBy: confirmedAt ? admin._id : null,
-      confirmedAt,
-      assignedAt: agentIndex !== null ? new Date(createdAt.getTime() + 20 * 60_000) : null,
-      acceptedAt: ['accepted', 'picked_up', 'on_the_way', 'delivered'].includes(status)
-        ? new Date(createdAt.getTime() + 22 * 60_000)
-        : null,
-      pickedUpAt: ['picked_up', 'on_the_way', 'delivered'].includes(status)
-        ? new Date(createdAt.getTime() + 28 * 60_000)
-        : null,
-      deliveredAt: status === 'delivered' ? new Date(createdAt.getTime() + 40 * 60_000) : null,
-      cancelledReason: status === 'cancelled' ? 'الزبون لم يرد على الهاتف' : null,
-      events,
-      createdAt,
-    });
+    // `timestamps: false` so the seeded createdAt below actually sticks —
+    // otherwise Mongoose stamps every order with "now" and the history and
+    // analytics ranges look empty.
+    const [order] = await Order.create(
+      [
+        {
+          code: generateOrderCode(),
+          customer: customer._id,
+          vendor: assala._id,
+          status,
+          deliveryType: customerIndex === 1 ? 'vip' : 'normal',
+          paymentMethod: 'cash',
+          address: {
+            label: address.label,
+            wilaya: address.wilaya,
+            commune: address.commune,
+            street: address.street,
+            notes: address.notes,
+          },
+          deliveryLocation: address.location,
+          customerNote: customerIndex === 0 ? 'اتصل بي عند الوصول من فضلك' : undefined,
+          items,
+          subtotalCentimes: subtotal,
+          serviceFeeCentimes: settings.serviceFeeCentimes,
+          deliveryFeeCentimes: assala.deliveryFeeCentimes,
+          discountCentimes: 0,
+          pointsUsed: 0,
+          pointsEarned: Math.floor(subtotal / 10_000),
+          totalCentimes: total,
+          agent: agentIndex !== null ? agents[agentIndex]!._id : null,
+          confirmedBy: confirmedAt ? admin._id : null,
+          confirmedAt,
+          assignedAt: agentIndex !== null ? new Date(createdAt.getTime() + 20 * 60_000) : null,
+          acceptedAt: ['accepted', 'picked_up', 'on_the_way', 'delivered'].includes(status)
+            ? new Date(createdAt.getTime() + 22 * 60_000)
+            : null,
+          pickedUpAt: ['picked_up', 'on_the_way', 'delivered'].includes(status)
+            ? new Date(createdAt.getTime() + 28 * 60_000)
+            : null,
+          deliveredAt: status === 'delivered' ? new Date(createdAt.getTime() + 40 * 60_000) : null,
+          cancelledReason: status === 'cancelled' ? 'الزبون لم يرد على الهاتف' : null,
+          events,
+          createdAt,
+          // With timestamps disabled Mongoose sets neither, and the
+          // cancellation analytics filters on updatedAt.
+          updatedAt: events.length ? events[events.length - 1]!.at : createdAt,
+        },
+      ],
+      { timestamps: false },
+    );
+    return order!;
   }
 
   await makeOrder(0, 'pending', null, 3);

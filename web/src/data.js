@@ -4,7 +4,7 @@
  */
 
 /** Where the download button points. Kept here because it changes per deploy. */
-export const APK_URL = 'https://drive.google.com/uc?export=download&id=1CxwTrPBFyhL2xa3b8YA_5KtlTD6LtU8k';
+export const APK_URL = 'https://github.com/kingofdead6/Sagi/releases/download/v0/Saji.apk';
 
 /** Shown next to the button so nobody starts a 22MB download blind. */
 export const APK_SIZE = '22 ميغابايت';

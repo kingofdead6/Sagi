@@ -1876,6 +1876,42 @@ abstract class AppLocalizations {
   /// **'لا توجد طلبات مطابقة'**
   String get adminNoOrders;
 
+  /// No description provided for @adminColOrderCode.
+  ///
+  /// In ar, this message translates to:
+  /// **'رقم الطلب'**
+  String get adminColOrderCode;
+
+  /// No description provided for @adminColTime.
+  ///
+  /// In ar, this message translates to:
+  /// **'الوقت'**
+  String get adminColTime;
+
+  /// No description provided for @adminColStatus.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحالة'**
+  String get adminColStatus;
+
+  /// No description provided for @adminColUses.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاستعمالات'**
+  String get adminColUses;
+
+  /// No description provided for @adminColName.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاسم'**
+  String get adminColName;
+
+  /// No description provided for @adminColActions.
+  ///
+  /// In ar, this message translates to:
+  /// **'إجراءات'**
+  String get adminColActions;
+
   /// No description provided for @adminVendorNew.
   ///
   /// In ar, this message translates to:

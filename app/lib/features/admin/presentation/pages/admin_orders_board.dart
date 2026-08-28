@@ -49,7 +49,7 @@ class AdminOrdersBoard extends ConsumerWidget {
           emptyState: EmptyState(title: l10n.adminNoOrders, icon: Icons.receipt_long_outlined),
           columns: [
             AdminColumn(
-              label: l10n.successOrderCode(''),
+              label: l10n.adminColOrderCode,
               width: 110,
               build: (order) => Text(order.code, style: AppText.adminTableHead),
             ),
@@ -99,7 +99,7 @@ class AdminOrdersBoard extends ConsumerWidget {
               build: (order) => PriceText(order.totalCentimes, style: AppText.adminTable),
             ),
             AdminColumn(
-              label: l10n.filterSort,
+              label: l10n.adminColStatus,
               width: 150,
               build: (order) => Wrap(
                 spacing: 4,
@@ -111,7 +111,7 @@ class AdminOrdersBoard extends ConsumerWidget {
               ),
             ),
             AdminColumn(
-              label: l10n.commonToday,
+              label: l10n.adminColTime,
               width: 70,
               build: (order) => Text(
                 '${order.createdAt.hour.toString().padLeft(2, '0')}:'
@@ -187,7 +187,7 @@ class _AdminOrdersFilterBarState extends ConsumerState<AdminOrdersFilterBar> {
             child: DropdownButtonFormField<String?>(
               initialValue: filters.status,
               style: AppText.adminTable,
-              decoration: InputDecoration(labelText: l10n.filterSort),
+              decoration: InputDecoration(labelText: l10n.adminColStatus),
               items: [
                 DropdownMenuItem(value: null, child: Text(l10n.filterAll)),
                 for (final status in statuses)

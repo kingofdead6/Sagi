@@ -1,10 +1,8 @@
 {
   "@@locale": "ar",
-
   "appName": "ساجي",
   "welcomeTitle": "مرحباً بك في ساجي",
   "welcomeSubtitle": "كل ما تحتاجه، يصلك إلى باب دارك",
-
   "commonRetry": "إعادة المحاولة",
   "commonCancel": "إلغاء",
   "commonConfirm": "تأكيد",
@@ -30,7 +28,6 @@
   "commonNone": "لا شيء",
   "commonRefresh": "تحديث",
   "commonExport": "تصدير",
-
   "errorGeneric": "حدث خطأ غير متوقع، حاول من جديد",
   "errorNetwork": "لا يوجد اتصال بالإنترنت، تحقق من الشبكة",
   "errorTimeout": "استغرق الطلب وقتاً طويلاً، حاول من جديد",
@@ -41,7 +38,6 @@
   "errorConflict": "لا يمكن تنفيذ هذا الإجراء الآن",
   "errorValidation": "تحقق من البيانات المُدخلة",
   "errorTooMany": "محاولات كثيرة، انتظر قليلاً",
-
   "authLoginTitle": "تسجيل الدخول",
   "authRegisterTitle": "إنشاء حساب",
   "authPhone": "رقم الهاتف",
@@ -61,13 +57,18 @@
   "authInvalidName": "أدخل اسمك الكامل",
   "authOtpTitle": "رمز التحقق",
   "authOtpSubtitle": "أدخل الرمز المرسل إلى {phone}",
-  "@authOtpSubtitle": { "placeholders": { "phone": { "type": "String" } } },
+  "@authOtpSubtitle": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
   "authOtpResend": "إعادة إرسال الرمز",
   "authOtpDisabled": "التحقق عبر الرمز غير مفعّل حالياً، استعمل كلمة المرور",
   "authChangePassword": "تغيير كلمة المرور",
   "authCurrentPassword": "كلمة المرور الحالية",
   "authNewPassword": "كلمة المرور الجديدة",
-
   "locationTitle": "أين نوصّل طلبك؟",
   "locationSubtitle": "حدّد موقعك على الخريطة أو اكتب عنوانك",
   "locationUseGps": "استعمال موقعي الحالي",
@@ -77,7 +78,6 @@
   "locationSearching": "جارٍ تحديد العنوان…",
   "locationUnknownAddress": "تعذّر تحديد اسم المكان، اكتبه بنفسك",
   "locationConfirm": "تأكيد الموقع",
-
   "addressTitle": "عناويني",
   "addressAdd": "إضافة عنوان",
   "addressEdit": "تعديل العنوان",
@@ -92,7 +92,6 @@
   "addressDefault": "افتراضي",
   "addressEmpty": "لم تضف أي عنوان بعد",
   "addressDeleteConfirm": "هل تريد حذف هذا العنوان؟",
-
   "homeDeliverTo": "التوصيل إلى",
   "homeSearchHint": "ماذا تريد أن تأكل؟",
   "homeCategories": "الفئات",
@@ -100,30 +99,57 @@
   "homeOffers": "العروض",
   "homeNoVendors": "لا توجد متاجر متاحة في منطقتك حالياً",
   "homeNoOffers": "لا توجد عروض حالياً",
-
   "navHome": "الرئيسية",
   "navOrders": "الطلبات",
   "navProfile": "حسابي",
   "navCart": "السلة",
-
   "vendorsTitle": "المتاجر",
   "vendorClosed": "مغلق حالياً",
   "vendorOpen": "مفتوح",
   "vendorMinOrder": "الحد الأدنى {amount}",
-  "@vendorMinOrder": { "placeholders": { "amount": { "type": "String" } } },
+  "@vendorMinOrder": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "vendorDeliveryFee": "التوصيل {amount}",
-  "@vendorDeliveryFee": { "placeholders": { "amount": { "type": "String" } } },
+  "@vendorDeliveryFee": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "vendorMinutes": "{count} دقيقة",
-  "@vendorMinutes": { "placeholders": { "count": { "type": "int" } } },
+  "@vendorMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "vendorKm": "{value} كلم",
-  "@vendorKm": { "placeholders": { "value": { "type": "String" } } },
+  "@vendorKm": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "vendorRatings": "({count} تقييم)",
-  "@vendorRatings": { "placeholders": { "count": { "type": "int" } } },
+  "@vendorRatings": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "vendorSearchHint": "ابحث في القائمة",
   "vendorSpecialOffers": "عروض خاصة",
   "vendorEmptyMenu": "لا توجد منتجات في هذا المتجر بعد",
   "vendorClosedCta": "المتجر مغلق حالياً",
-
   "filterTitle": "تصفية النتائج",
   "filterOpenNow": "مفتوح الآن",
   "filterHasOffer": "لديه عروض",
@@ -134,7 +160,6 @@
   "filterSortFeatured": "المميزة",
   "filterCategory": "الفئة",
   "filterAll": "الكل",
-
   "productAddToCart": "إضافة إلى السلة",
   "productUnavailable": "غير متوفر حالياً",
   "productQuantity": "الكمية",
@@ -142,7 +167,6 @@
   "productChooseOne": "اختر واحداً",
   "productChooseMany": "اختر ما تريد",
   "productAdded": "تمت الإضافة إلى السلة",
-
   "cartTitle": "السلة",
   "cartEmpty": "سلتك فارغة",
   "cartEmptyAction": "تصفّح المتاجر",
@@ -152,9 +176,14 @@
   "cartClearMessage": "سلتك تحتوي منتجات من متجر آخر. هل تريد إفراغها والبدء من جديد؟",
   "cartClearConfirm": "إفراغ السلة",
   "cartItemCount": "{count} منتج",
-  "@cartItemCount": { "placeholders": { "count": { "type": "int" } } },
+  "@cartItemCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "cartRemoveItem": "حذف المنتج",
-
   "checkoutTitle": "إتمام الطلب",
   "checkoutAddress": "عنوان التوصيل",
   "checkoutChangeAddress": "تغيير",
@@ -172,7 +201,13 @@
   "checkoutVoucherRemove": "إزالة",
   "checkoutUsePoints": "استخدام النقاط",
   "checkoutPointsBalance": "لديك {count} نقطة",
-  "@checkoutPointsBalance": { "placeholders": { "count": { "type": "int" } } },
+  "@checkoutPointsBalance": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "checkoutNote": "ملاحظة للمتجر",
   "checkoutNoteHint": "مثال: بدون بصل، اتصل عند الوصول…",
   "checkoutSubtotal": "المجموع",
@@ -182,14 +217,18 @@
   "checkoutGrandTotal": "المجموع الكلي",
   "checkoutSubmit": "تاكيد الطلب",
   "checkoutNoAddress": "أضف عنواناً قبل إتمام الطلب",
-
   "successTitle": "تم استلام طلبك",
   "successMessage": "سنتصل بك لتأكيد الطلب",
   "successOrderCode": "رقم الطلب {code}",
-  "@successOrderCode": { "placeholders": { "code": { "type": "String" } } },
+  "@successOrderCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
   "successTrack": "تتبّع الطلب",
   "successBackHome": "العودة إلى الرئيسية",
-
   "ordersTitle": "طلباتي",
   "ordersEmpty": "لم تطلب أي شيء بعد",
   "ordersEmptyAction": "ابدأ التسوّق",
@@ -208,7 +247,6 @@
   "ordersCallSupport": "الاتصال بالدعم",
   "ordersAgentOnWay": "السائق في الطريق إليك",
   "ordersNoAgentYet": "لم يُسند الطلب إلى سائق بعد",
-
   "statusPending": "بانتظار التأكيد",
   "statusConfirmed": "تم التأكيد",
   "statusSentToVendor": "أُرسل إلى المتجر",
@@ -221,7 +259,6 @@
   "statusDelivered": "تم التوصيل",
   "statusCancelled": "ملغى",
   "statusLate": "متأخر",
-
   "ratingTitle": "كيف كانت تجربتك؟",
   "ratingVendor": "تقييم المتجر",
   "ratingAgent": "تقييم السائق",
@@ -229,14 +266,19 @@
   "ratingCommentHint": "شاركنا رأيك (اختياري)",
   "ratingSubmit": "إرسال التقييم",
   "ratingThanks": "شكراً على تقييمك",
-
   "profileTitle": "حسابي",
   "profileAccount": "الحساب",
   "profileEditProfile": "تعديل الملف الشخصي",
   "profileMyAddresses": "عناويني",
   "profileMyPoints": "نقاطي",
   "profilePointsValue": "{count} نقطة",
-  "@profilePointsValue": { "placeholders": { "count": { "type": "int" } } },
+  "@profilePointsValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "profileVouchers": "قسائم و كوبونات",
   "profileSettings": "الإعدادات",
   "profileNotifications": "الإشعارات",
@@ -249,7 +291,6 @@
   "profileDangerZone": "منطقة الخطر",
   "profileDeleteAccount": "حذف الحساب",
   "profileDeleteConfirm": "سيتم حذف حسابك نهائياً. هل أنت متأكد؟",
-
   "agentTitle": "لوحة السائق",
   "agentOnline": "متصل",
   "agentOffline": "غير متصل",
@@ -275,7 +316,13 @@
   "agentSwipeDelivered": "اسحب لتأكيد التسليم",
   "agentCashCollected": "أكّد استلام المبلغ نقداً",
   "agentCashAmount": "المبلغ المطلوب {amount}",
-  "@agentCashAmount": { "placeholders": { "amount": { "type": "String" } } },
+  "@agentCashAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "agentHistory": "سجل التوصيلات",
   "agentStats": "إحصائياتي",
   "agentDeliveries": "التوصيلات",
@@ -283,12 +330,17 @@
   "agentAvgTime": "متوسط المدة",
   "agentTodayDeliveries": "توصيلات اليوم",
   "agentOfferExpires": "تبقّى {seconds} ثانية",
-  "@agentOfferExpires": { "placeholders": { "seconds": { "type": "int" } } },
+  "@agentOfferExpires": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "agentOfferExpired": "انتهت مهلة هذا الطلب",
   "agentPayout": "أجر التوصيل",
   "agentDistance": "المسافة",
   "agentLocationRunning": "تتبّع الموقع نشط",
-
   "adminDashboard": "لوحة القيادة",
   "adminOrders": "الطلبات",
   "adminCustomers": "العملاء",
@@ -301,7 +353,6 @@
   "adminAnalytics": "التحليلات",
   "adminFleet": "خريطة الأسطول",
   "adminSettings": "الإعدادات",
-
   "adminStatTodayOrders": "طلبات اليوم",
   "adminStatRevenue": "المداخيل",
   "adminStatActiveDeliveries": "توصيلات جارية",
@@ -309,7 +360,6 @@
   "adminStatLate": "طلبات متأخرة",
   "adminStatPending": "بانتظار التأكيد",
   "adminStatOnlineAgents": "سائقون متصلون",
-
   "adminOrderNew": "طلب جديد وصل",
   "adminOrderLate": "طلب متأخر",
   "adminCustomerInfo": "معلومات الزبون",
@@ -327,11 +377,22 @@
   "adminAssignTitle": "اختر سائقاً",
   "adminAssignEmpty": "لا يوجد سائق متصل حالياً",
   "adminAgentLoad": "{count} طلب جارٍ",
-  "@adminAgentLoad": { "placeholders": { "count": { "type": "int" } } },
+  "@adminAgentLoad": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "adminSearchOrders": "ابحث برقم الطلب أو الهاتف",
   "adminExportCsv": "تصدير CSV",
   "adminNoOrders": "لا توجد طلبات مطابقة",
-
+  "adminColOrderCode": "رقم الطلب",
+  "adminColTime": "الوقت",
+  "adminColStatus": "الحالة",
+  "adminColUses": "الاستعمالات",
+  "adminColName": "الاسم",
+  "adminColActions": "إجراءات",
   "adminVendorNew": "متجر جديد",
   "adminVendorEdit": "تعديل المتجر",
   "adminVendorName": "اسم المتجر",
@@ -347,7 +408,6 @@
   "adminVendorIsOpen": "مفتوح",
   "adminVendorLogo": "الشعار",
   "adminVendorCover": "صورة الغلاف",
-
   "adminSectionNew": "قسم جديد",
   "adminSectionName": "اسم القسم",
   "adminProductNew": "منتج جديد",
@@ -362,7 +422,6 @@
   "adminProductAddOption": "إضافة خيار",
   "adminProductBulkAvailable": "تفعيل المحدد",
   "adminProductBulkUnavailable": "تعطيل المحدد",
-
   "adminOfferNew": "عرض جديد",
   "adminOfferTitle": "عنوان العرض",
   "adminOfferSubtitle": "العنوان الفرعي",
@@ -377,15 +436,19 @@
   "adminOfferSchedule": "الفترة",
   "adminOfferShowOnHome": "إظهار في الصفحة الرئيسية",
   "adminOfferPreview": "معاينة",
-
   "adminVoucherNew": "قسيمة جديدة",
   "adminVoucherCode": "الرمز",
   "adminVoucherMinOrder": "الحد الأدنى للطلب",
   "adminVoucherMaxUses": "أقصى عدد استعمالات",
   "adminVoucherPerUser": "لكل مستخدم",
   "adminVoucherUsed": "استُعملت {count} مرة",
-  "@adminVoucherUsed": { "placeholders": { "count": { "type": "int" } } },
-
+  "@adminVoucherUsed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "adminAgentNew": "سائق جديد",
   "adminAgentTempPassword": "كلمة مرور مؤقتة",
   "adminAgentSuspend": "تعليق الحساب",
@@ -395,20 +458,23 @@
   "adminCustomerBlocked": "محظور",
   "adminCustomerOrders": "عدد الطلبات",
   "adminCustomerSpent": "إجمالي المشتريات",
-
   "adminAnalyticsOrdersOverTime": "الطلبات عبر الزمن",
   "adminAnalyticsTopVendors": "أفضل المتاجر",
   "adminAnalyticsTopProducts": "أكثر المنتجات مبيعاً",
   "adminAnalyticsAgents": "ترتيب السائقين",
   "adminAnalyticsCancellations": "أسباب الإلغاء",
   "adminAnalyticsRange": "الفترة",
-
   "adminFleetIdle": "متفرّغ",
   "adminFleetOnDelivery": "في توصيل",
   "adminFleetEmpty": "لا يوجد سائق متصل",
   "adminFleetLastSeen": "آخر ظهور {time}",
-  "@adminFleetLastSeen": { "placeholders": { "time": { "type": "String" } } },
-
+  "@adminFleetLastSeen": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "settingsServiceFee": "رسوم الخدمة",
   "settingsVipSurcharge": "رسوم VIP الإضافية",
   "settingsAssignTimeout": "مهلة قبول الطلب (ثانية)",
@@ -420,13 +486,17 @@
   "settingsMaxPointsPercent": "أقصى نسبة نقاط من المجموع",
   "settingsElectronicPayment": "تفعيل الدفع الإلكتروني",
   "settingsSaved": "تم حفظ الإعدادات",
-
   "emptyTitle": "لا يوجد شيء هنا",
   "emptySearch": "لا توجد نتائج لبحثك",
   "errorRetryTitle": "تعذّر تحميل البيانات",
   "offlineBanner": "أنت غير متصل — نعرض آخر البيانات المحفوظة",
-
   "currencySymbol": "د.ج",
   "amountWithCurrency": "{amount} د.ج",
-  "@amountWithCurrency": { "placeholders": { "amount": { "type": "String" } } }
+  "@amountWithCurrency": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  }
 }

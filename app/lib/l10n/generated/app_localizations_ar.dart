@@ -927,6 +927,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adminNoOrders => 'لا توجد طلبات مطابقة';
 
   @override
+  String get adminColOrderCode => 'رقم الطلب';
+
+  @override
+  String get adminColTime => 'الوقت';
+
+  @override
+  String get adminColStatus => 'الحالة';
+
+  @override
+  String get adminColUses => 'الاستعمالات';
+
+  @override
+  String get adminColName => 'الاسم';
+
+  @override
+  String get adminColActions => 'إجراءات';
+
+  @override
   String get adminVendorNew => 'متجر جديد';
 
   @override

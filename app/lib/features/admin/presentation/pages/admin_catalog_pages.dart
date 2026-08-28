@@ -996,7 +996,7 @@ class AdminVouchersPage extends ConsumerWidget {
                 ),
                 AdminColumn(
                   label: l10n.adminOfferType,
-                  build: (v) => Text(v.type, style: AppText.adminTable),
+                  build: (v) => Text(_voucherTypeLabel(context, v.type), style: AppText.adminTable),
                 ),
                 AdminColumn(
                   label: l10n.adminOfferValue,
@@ -1009,7 +1009,7 @@ class AdminVouchersPage extends ConsumerWidget {
                   build: (v) => PriceText(Money(v.minOrderCentimes), style: AppText.adminTable),
                 ),
                 AdminColumn(
-                  label: l10n.adminVoucherUsed(0),
+                  label: l10n.adminColUses,
                   width: 120,
                   build: (v) => Text(
                     v.maxUses == 0 ? '${v.usedCount}' : '${v.usedCount}/${v.maxUses}',
@@ -1022,6 +1022,15 @@ class AdminVouchersPage extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  static String _voucherTypeLabel(BuildContext context, String type) {
+    final l10n = context.l10n;
+    return switch (type) {
+      'fixed' => l10n.adminOfferTypeFixed,
+      'freeDelivery' => l10n.adminOfferTypeFreeDelivery,
+      _ => l10n.adminOfferTypePercentage,
+    };
   }
 
   Future<void> _edit(BuildContext context, WidgetRef ref, Voucher? voucher) async {
@@ -1228,7 +1237,7 @@ class AdminCategoriesPage extends ConsumerWidget {
             build: (c) => Text('${c.sortOrder}', style: AppText.adminTable),
           ),
           AdminColumn(
-            label: l10n.vendorOpen,
+            label: l10n.adminColStatus,
             width: 110,
             build: (c) => _Badge(
               label: c.isActive ? l10n.commonYes : l10n.commonNo,

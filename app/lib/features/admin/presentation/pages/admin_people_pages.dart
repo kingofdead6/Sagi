@@ -85,7 +85,7 @@ class AdminAgentsPage extends ConsumerWidget {
                   ),
                 ),
                 AdminColumn(
-                  label: l10n.adminAgentActivate,
+                  label: l10n.adminColActions,
                   width: 160,
                   build: (u) => _AgentActions(agent: u),
                 ),
@@ -278,7 +278,7 @@ class AdminCustomersPage extends ConsumerWidget {
             build: (u) => Text('${u.points}', style: AppText.adminTable),
           ),
           AdminColumn(
-            label: l10n.adminCustomerBlock,
+            label: l10n.adminColActions,
             width: 160,
             build: (u) => _BlockToggle(customer: u),
           ),

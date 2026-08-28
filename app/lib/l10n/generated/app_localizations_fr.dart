@@ -1216,4 +1216,142 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get adminOfferImage => 'Image de l\'offre';
+
+  @override
+  String get vouchersEmptyTitle => 'Aucun coupon';
+
+  @override
+  String get vouchersEmptyMessage => 'Vos coupons disponibles apparaîtront ici';
+
+  @override
+  String get vouchersCopy => 'Copier le code';
+
+  @override
+  String get vouchersFreeDelivery => 'Livraison gratuite';
+
+  @override
+  String vouchersCopied(String code) {
+    return '$code copié';
+  }
+
+  @override
+  String vouchersMinOrder(String amount) {
+    return 'Commande minimum $amount';
+  }
+
+  @override
+  String vouchersExpires(String date) {
+    return 'Expire le $date';
+  }
+
+  @override
+  String vouchersPercentOff(String value) {
+    return '$value% de réduction';
+  }
+
+  @override
+  String vouchersAmountOff(String amount) {
+    return '$amount de réduction';
+  }
+
+  @override
+  String get notificationsCategories => 'Catégories';
+
+  @override
+  String get notificationsOrderUpdates => 'Suivi de commande';
+
+  @override
+  String get notificationsOrderUpdatesHint =>
+      'Alerte à chaque changement de statut';
+
+  @override
+  String get notificationsPromotions => 'Promotions';
+
+  @override
+  String get notificationsPromotionsHint => 'Réductions et nouveaux coupons';
+
+  @override
+  String get notificationsNewVendors => 'Nouveaux commerces';
+
+  @override
+  String get notificationsNewVendorsHint =>
+      'Quand un commerce ouvre près de vous';
+
+  @override
+  String get notificationsEnabled => 'Notifications activées';
+
+  @override
+  String get notificationsEnabledHint => 'Vous recevrez les alertes choisies';
+
+  @override
+  String get notificationsDisabled => 'Notifications désactivées';
+
+  @override
+  String get notificationsDisabledHint =>
+      'Activez-les pour suivre vos commandes';
+
+  @override
+  String get notificationsEnable => 'Activer';
+
+  @override
+  String get languageHint => 'La langue s\'applique à toute l\'application';
+
+  @override
+  String get portalTitle => 'Mon commerce';
+
+  @override
+  String get portalOpen => 'Ouvert — commandes acceptées';
+
+  @override
+  String get portalClosed => 'Fermé — commandes suspendues';
+
+  @override
+  String get portalSections => 'Sections';
+
+  @override
+  String get portalAddSection => 'Ajouter une section';
+
+  @override
+  String get portalSectionName => 'Nom de la section';
+
+  @override
+  String get portalDeleteSectionHint =>
+      'La section sera supprimée ; ses produits resteront sans section';
+
+  @override
+  String get portalAddProduct => 'Nouveau produit';
+
+  @override
+  String get portalEditProduct => 'Modifier le produit';
+
+  @override
+  String get portalUnsectioned => 'Sans section';
+
+  @override
+  String get portalUnavailable => 'Indisponible';
+
+  @override
+  String get portalEmptyTitle => 'Menu vide';
+
+  @override
+  String get portalEmptyMessage => 'Ajoutez vos sections et produits';
+
+  @override
+  String get adminVendorAccount => 'Compte du commerce';
+
+  @override
+  String get adminVendorAccountCreate => 'Créer un identifiant';
+
+  @override
+  String get adminVendorAccountExists => 'Ce commerce a un identifiant';
+
+  @override
+  String get adminVendorAccountNone => 'Aucun identifiant';
+
+  @override
+  String get adminVendorAccountHint =>
+      'Le propriétaire gère uniquement son menu';
+
+  @override
+  String get adminVendorAccountRevoke => 'Supprimer l\'identifiant';
 }

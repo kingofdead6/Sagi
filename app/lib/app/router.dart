@@ -19,6 +19,10 @@ import 'package:saji/features/home/presentation/customer_shell.dart';
 import 'package:saji/features/orders/presentation/order_detail_screen.dart';
 import 'package:saji/features/profile/presentation/address_edit_screen.dart';
 import 'package:saji/features/profile/presentation/addresses_screen.dart';
+import 'package:saji/features/profile/presentation/language_screen.dart';
+import 'package:saji/features/profile/presentation/notifications_screen.dart';
+import 'package:saji/features/portal/presentation/portal_screen.dart';
+import 'package:saji/features/profile/presentation/vouchers_screen.dart';
 import 'package:saji/features/profile/presentation/location_setup_screen.dart';
 import 'package:saji/features/vendors/presentation/vendor_screen.dart';
 import 'package:saji/features/vendors/presentation/vendors_screen.dart';
@@ -65,6 +69,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final home = switch (auth.role) {
         UserRole.admin => Routes.adminDashboard,
         UserRole.agent => Routes.agentHome,
+        UserRole.vendor => Routes.vendorPortal,
         UserRole.customer => Routes.home,
       };
 
@@ -72,11 +77,13 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       final inAdmin = path.startsWith('/admin');
       final inAgent = path.startsWith('/agent');
+      final inPortal = path.startsWith('/portal');
 
       return switch (auth.role) {
         UserRole.admin => inAdmin ? null : Routes.adminDashboard,
         UserRole.agent => inAgent ? null : Routes.agentHome,
-        UserRole.customer => (inAdmin || inAgent) ? Routes.home : null,
+        UserRole.vendor => inPortal ? null : Routes.vendorPortal,
+        UserRole.customer => (inAdmin || inAgent || inPortal) ? Routes.home : null,
       };
     },
 
@@ -86,6 +93,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.register, builder: (_, __) => const RegisterScreen()),
       GoRoute(path: Routes.otp, builder: (_, __) => const OtpScreen()),
       GoRoute(path: Routes.devGallery, builder: (_, __) => const GalleryScreen()),
+
+      // ── vendor portal ───────────────────────────────────────────────────
+      GoRoute(path: Routes.vendorPortal, builder: (_, __) => const PortalScreen()),
 
       // ── customer ────────────────────────────────────────────────────────
       GoRoute(path: Routes.home, builder: (_, __) => const CustomerShell(tab: 0)),
@@ -116,6 +126,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, state) => OrderDetailScreen(orderId: state.pathParameters['id']!),
       ),
       GoRoute(path: Routes.addresses, builder: (_, __) => const AddressesScreen()),
+      GoRoute(path: Routes.vouchers, builder: (_, __) => const VouchersScreen()),
+      GoRoute(
+        path: Routes.notifications,
+        builder: (_, __) => const NotificationsScreen(),
+      ),
+      GoRoute(path: Routes.language, builder: (_, __) => const LanguageScreen()),
       GoRoute(
         path: Routes.addressEdit,
         builder: (_, state) => AddressEditScreen(addressId: state.uri.queryParameters['id']),

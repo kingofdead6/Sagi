@@ -30,6 +30,8 @@ export interface VendorDoc extends Document<Types.ObjectId> {
   isFeatured: boolean;
   sortOrder: number;
   isActive: boolean;
+  /** The 'vendor' user who signs in to manage this shop, if one exists. */
+  owner?: Types.ObjectId | null;
 }
 
 const openingHourSchema = new Schema<OpeningHour>(
@@ -63,6 +65,7 @@ const vendorSchema = new Schema<VendorDoc>(
     isFeatured: { type: Boolean, default: false, index: true },
     sortOrder: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true, index: true },
+    owner: { type: Schema.Types.ObjectId, ref: 'User', default: null, index: true },
   },
   BASE_SCHEMA_OPTIONS,
 );

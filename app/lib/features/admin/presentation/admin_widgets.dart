@@ -72,17 +72,33 @@ class StatCard extends StatelessWidget {
 
 /// A column definition for [AdminDataTable].
 class AdminColumn<T> {
-  const AdminColumn({required this.label, required this.build, this.flex = 1, this.width});
+  const AdminColumn({
+    required this.label,
+    required this.build,
+    this.flex = 1,
+    this.width,
+    this.minWidth,
+  });
 
   final String label;
   final Widget Function(T row) build;
   final int flex;
   final double? width;
+
+  /// Width this column refuses to shrink below. Once the columns together need
+  /// more room than the viewport, the table scrolls sideways instead of
+  /// crushing every cell — which is what made narrow windows unusable.
+  final double? minWidth;
+
+  /// What this column occupies when the table is laid out at its floor width.
+  double get _floor => width ?? minWidth ?? _defaultMinWidth;
+
+  static const _defaultMinWidth = 120.0;
 }
 
 /// The dashboard table: sticky header, hover highlight, and a row tint that
 /// carries the order's status colour.
-class AdminDataTable<T> extends StatelessWidget {
+class AdminDataTable<T> extends StatefulWidget {
   const AdminDataTable({
     required this.columns,
     required this.rows,
@@ -99,47 +115,94 @@ class AdminDataTable<T> extends StatelessWidget {
   final Widget? emptyState;
 
   @override
-  Widget build(BuildContext context) {
-    if (rows.isEmpty && emptyState != null) return emptyState!;
+  State<AdminDataTable<T>> createState() => _AdminDataTableState<T>();
+}
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Container(
-          decoration: const BoxDecoration(
-            color: AppColors.adminRowHover,
-            border: Border(bottom: BorderSide(color: AppColors.adminBorder)),
-          ),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg,
-            vertical: AppSpacing.md,
-          ),
-          child: Row(
+class _AdminDataTableState<T> extends State<AdminDataTable<T>> {
+  final _horizontal = ScrollController();
+
+  /// Horizontal padding applied to both the header and every row.
+  static const _rowPadding = AppSpacing.lg * 2;
+
+  @override
+  void dispose() {
+    _horizontal.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.rows.isEmpty && widget.emptyState != null) return widget.emptyState!;
+
+    final floor = widget.columns.fold<double>(0, (sum, c) => sum + c._floor) + _rowPadding;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Wide enough: keep the flexible layout so columns fill the window.
+        // Too narrow: lay the table out at its floor width and scroll.
+        final needsScroll = constraints.maxWidth < floor;
+        final tableWidth = needsScroll ? floor : constraints.maxWidth;
+
+        final table = SizedBox(
+          width: tableWidth,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              for (final column in columns)
-                _Cell(
-                  flex: column.flex,
-                  width: column.width,
-                  child: Text(column.label, style: AppText.adminTableHead),
+              Container(
+                decoration: const BoxDecoration(
+                  color: AppColors.adminRowHover,
+                  border: Border(bottom: BorderSide(color: AppColors.adminBorder)),
                 ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.md,
+                ),
+                child: Row(
+                  children: [
+                    for (final column in widget.columns)
+                      _Cell(
+                        flex: column.flex,
+                        width: column.width,
+                        minWidth: column.minWidth,
+                        pinned: needsScroll,
+                        child: Text(column.label, style: AppText.adminTableHead),
+                      ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: widget.rows.length,
+                  itemBuilder: (context, index) {
+                    final row = widget.rows[index];
+                    return _TableRow<T>(
+                      row: row,
+                      columns: widget.columns,
+                      onTap: widget.onRowTap,
+                      tint: widget.rowColor?.call(row),
+                      pinned: needsScroll,
+                    );
+                  },
+                ),
+              ),
             ],
           ),
-        ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: rows.length,
-            itemBuilder: (context, index) {
-              final row = rows[index];
-              return _TableRow<T>(
-                row: row,
-                columns: columns,
-                onTap: onRowTap,
-                tint: rowColor?.call(row),
-              );
-            },
+        );
+
+        if (!needsScroll) return table;
+
+        // One scroll view wraps header and body together, so they can never
+        // drift out of alignment the way two synced controllers would.
+        return Scrollbar(
+          controller: _horizontal,
+          thumbVisibility: true,
+          child: SingleChildScrollView(
+            controller: _horizontal,
+            scrollDirection: Axis.horizontal,
+            child: table,
           ),
-        ),
-      ],
+        );
+      },
     );
   }
 }
@@ -148,6 +211,7 @@ class _TableRow<T> extends StatefulWidget {
   const _TableRow({
     required this.row,
     required this.columns,
+    this.pinned = false,
     required this.onTap,
     this.tint,
   });
@@ -155,6 +219,7 @@ class _TableRow<T> extends StatefulWidget {
   final T row;
   final List<AdminColumn<T>> columns;
   final void Function(T row)? onTap;
+  final bool pinned;
   final Color? tint;
 
   @override
@@ -188,6 +253,8 @@ class _TableRowState<T> extends State<_TableRow<T>> {
                 _Cell(
                   flex: column.flex,
                   width: column.width,
+                  minWidth: column.minWidth,
+                  pinned: widget.pinned,
                   child: column.build(widget.row),
                 ),
             ],
@@ -199,16 +266,28 @@ class _TableRowState<T> extends State<_TableRow<T>> {
 }
 
 class _Cell extends StatelessWidget {
-  const _Cell({required this.child, required this.flex, this.width});
+  const _Cell({
+    required this.child,
+    required this.flex,
+    this.width,
+    this.minWidth,
+    this.pinned = false,
+  });
 
   final Widget child;
   final int flex;
   final double? width;
+  final double? minWidth;
+
+  /// True while the table is laid out at its floor width inside a horizontal
+  /// scroller, where `Expanded` has no bounded width to expand into.
+  final bool pinned;
 
   @override
   Widget build(BuildContext context) {
-    if (width != null) {
-      return SizedBox(width: width, child: child);
+    if (width != null) return SizedBox(width: width, child: child);
+    if (pinned) {
+      return SizedBox(width: minWidth ?? AdminColumn._defaultMinWidth, child: child);
     }
     return Expanded(flex: flex, child: child);
   }

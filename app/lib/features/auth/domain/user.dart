@@ -10,11 +10,16 @@ enum UserRole {
   @JsonValue('agent')
   agent,
   @JsonValue('admin')
-  admin;
+  admin,
+
+  /// A shop or restaurant owner. Signs in to manage their own menu only.
+  @JsonValue('vendor')
+  vendor;
 
   bool get isCustomer => this == UserRole.customer;
   bool get isAgent => this == UserRole.agent;
   bool get isAdmin => this == UserRole.admin;
+  bool get isVendor => this == UserRole.vendor;
 }
 
 @freezed

@@ -502,5 +502,81 @@
   "adminImagePick": "Tap to choose an image",
   "adminImageRemove": "Remove image",
   "adminProductImage": "Product image",
-  "adminOfferImage": "Offer image"
+  "adminOfferImage": "Offer image",
+  "vouchersEmptyTitle": "No vouchers",
+  "vouchersEmptyMessage": "Your available vouchers will appear here",
+  "vouchersCopy": "Copy code",
+  "vouchersFreeDelivery": "Free delivery",
+  "vouchersCopied": "Copied {code}",
+  "@vouchersCopied": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "vouchersMinOrder": "Minimum order {amount}",
+  "@vouchersMinOrder": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "vouchersExpires": "Expires {date}",
+  "@vouchersExpires": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "vouchersPercentOff": "{value}% off",
+  "@vouchersPercentOff": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "vouchersAmountOff": "{amount} off",
+  "@vouchersAmountOff": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationsCategories": "Categories",
+  "notificationsOrderUpdates": "Order updates",
+  "notificationsOrderUpdatesHint": "Alerts when your order status changes",
+  "notificationsPromotions": "Promotions",
+  "notificationsPromotionsHint": "Discounts and new vouchers",
+  "notificationsNewVendors": "New stores",
+  "notificationsNewVendorsHint": "When a store opens near you",
+  "notificationsEnabled": "Notifications on",
+  "notificationsEnabledHint": "You will get the alerts you choose",
+  "notificationsDisabled": "Notifications off",
+  "notificationsDisabledHint": "Turn them on to follow your orders",
+  "notificationsEnable": "Enable",
+  "languageHint": "The language applies to the whole app",
+  "portalTitle": "My store",
+  "portalOpen": "Open — accepting orders",
+  "portalClosed": "Closed — not accepting orders",
+  "portalSections": "Sections",
+  "portalAddSection": "Add section",
+  "portalSectionName": "Section name",
+  "portalDeleteSectionHint": "The section is deleted; its products stay without one",
+  "portalAddProduct": "New product",
+  "portalEditProduct": "Edit product",
+  "portalUnsectioned": "No section",
+  "portalUnavailable": "Unavailable",
+  "portalEmptyTitle": "Menu is empty",
+  "portalEmptyMessage": "Add your sections and products",
+  "adminVendorAccount": "Store account",
+  "adminVendorAccountCreate": "Create login",
+  "adminVendorAccountExists": "This store has a login",
+  "adminVendorAccountNone": "No login yet",
+  "adminVendorAccountHint": "The owner signs in to manage their menu only",
+  "adminVendorAccountRevoke": "Remove login"
 }

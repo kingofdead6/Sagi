@@ -2445,6 +2445,252 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'صورة العرض'**
   String get adminOfferImage;
+
+  /// No description provided for @vouchersEmptyTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد قسائم'**
+  String get vouchersEmptyTitle;
+
+  /// No description provided for @vouchersEmptyMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'ستظهر هنا القسائم المتاحة لك'**
+  String get vouchersEmptyMessage;
+
+  /// No description provided for @vouchersCopy.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسخ الرمز'**
+  String get vouchersCopy;
+
+  /// No description provided for @vouchersFreeDelivery.
+  ///
+  /// In ar, this message translates to:
+  /// **'توصيل مجاني'**
+  String get vouchersFreeDelivery;
+
+  /// No description provided for @vouchersCopied.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم نسخ {code}'**
+  String vouchersCopied(String code);
+
+  /// No description provided for @vouchersMinOrder.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحد الأدنى للطلب {amount}'**
+  String vouchersMinOrder(String amount);
+
+  /// No description provided for @vouchersExpires.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنتهي في {date}'**
+  String vouchersExpires(String date);
+
+  /// No description provided for @vouchersPercentOff.
+  ///
+  /// In ar, this message translates to:
+  /// **'خصم {value}%'**
+  String vouchersPercentOff(String value);
+
+  /// No description provided for @vouchersAmountOff.
+  ///
+  /// In ar, this message translates to:
+  /// **'خصم {amount}'**
+  String vouchersAmountOff(String amount);
+
+  /// No description provided for @notificationsCategories.
+  ///
+  /// In ar, this message translates to:
+  /// **'أنواع الإشعارات'**
+  String get notificationsCategories;
+
+  /// No description provided for @notificationsOrderUpdates.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحديثات الطلب'**
+  String get notificationsOrderUpdates;
+
+  /// No description provided for @notificationsOrderUpdatesHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'إشعار عند تغيّر حالة طلبك'**
+  String get notificationsOrderUpdatesHint;
+
+  /// No description provided for @notificationsPromotions.
+  ///
+  /// In ar, this message translates to:
+  /// **'العروض'**
+  String get notificationsPromotions;
+
+  /// No description provided for @notificationsPromotionsHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'تخفيضات وقسائم جديدة'**
+  String get notificationsPromotionsHint;
+
+  /// No description provided for @notificationsNewVendors.
+  ///
+  /// In ar, this message translates to:
+  /// **'متاجر جديدة'**
+  String get notificationsNewVendors;
+
+  /// No description provided for @notificationsNewVendorsHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'عند إضافة متجر قريب منك'**
+  String get notificationsNewVendorsHint;
+
+  /// No description provided for @notificationsEnabled.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإشعارات مفعّلة'**
+  String get notificationsEnabled;
+
+  /// No description provided for @notificationsEnabledHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ستصلك تنبيهات حسب اختيارك'**
+  String get notificationsEnabledHint;
+
+  /// No description provided for @notificationsDisabled.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإشعارات موقوفة'**
+  String get notificationsDisabled;
+
+  /// No description provided for @notificationsDisabledHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'فعّلها حتى تصلك تحديثات طلبك'**
+  String get notificationsDisabledHint;
+
+  /// No description provided for @notificationsEnable.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفعيل'**
+  String get notificationsEnable;
+
+  /// No description provided for @languageHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'تُطبَّق اللغة على التطبيق كامل'**
+  String get languageHint;
+
+  /// No description provided for @portalTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'متجري'**
+  String get portalTitle;
+
+  /// No description provided for @portalOpen.
+  ///
+  /// In ar, this message translates to:
+  /// **'المتجر مفتوح — نستقبل الطلبات'**
+  String get portalOpen;
+
+  /// No description provided for @portalClosed.
+  ///
+  /// In ar, this message translates to:
+  /// **'المتجر مغلق — لا نستقبل الطلبات'**
+  String get portalClosed;
+
+  /// No description provided for @portalSections.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأقسام'**
+  String get portalSections;
+
+  /// No description provided for @portalAddSection.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة قسم'**
+  String get portalAddSection;
+
+  /// No description provided for @portalSectionName.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم القسم'**
+  String get portalSectionName;
+
+  /// No description provided for @portalDeleteSectionHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'سيتم حذف القسم، وتبقى منتجاته بدون قسم'**
+  String get portalDeleteSectionHint;
+
+  /// No description provided for @portalAddProduct.
+  ///
+  /// In ar, this message translates to:
+  /// **'منتج جديد'**
+  String get portalAddProduct;
+
+  /// No description provided for @portalEditProduct.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعديل المنتج'**
+  String get portalEditProduct;
+
+  /// No description provided for @portalUnsectioned.
+  ///
+  /// In ar, this message translates to:
+  /// **'بدون قسم'**
+  String get portalUnsectioned;
+
+  /// No description provided for @portalUnavailable.
+  ///
+  /// In ar, this message translates to:
+  /// **'غير متوفر'**
+  String get portalUnavailable;
+
+  /// No description provided for @portalEmptyTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'القائمة فارغة'**
+  String get portalEmptyTitle;
+
+  /// No description provided for @portalEmptyMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'أضف أقسامك ومنتجاتك ليراها الزبائن'**
+  String get portalEmptyMessage;
+
+  /// No description provided for @adminVendorAccount.
+  ///
+  /// In ar, this message translates to:
+  /// **'حساب المتجر'**
+  String get adminVendorAccount;
+
+  /// No description provided for @adminVendorAccountCreate.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنشاء حساب دخول'**
+  String get adminVendorAccountCreate;
+
+  /// No description provided for @adminVendorAccountExists.
+  ///
+  /// In ar, this message translates to:
+  /// **'لهذا المتجر حساب دخول'**
+  String get adminVendorAccountExists;
+
+  /// No description provided for @adminVendorAccountNone.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يوجد حساب دخول'**
+  String get adminVendorAccountNone;
+
+  /// No description provided for @adminVendorAccountHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'يدخل صاحب المتجر ليدير قائمته فقط'**
+  String get adminVendorAccountHint;
+
+  /// No description provided for @adminVendorAccountRevoke.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف الحساب'**
+  String get adminVendorAccountRevoke;
 }
 
 class _AppLocalizationsDelegate

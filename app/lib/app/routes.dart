@@ -23,6 +23,9 @@ abstract final class Routes {
   static const profile = '/profile';
   static const addresses = '/addresses';
   static const addressEdit = '/addresses/edit';
+  static const vouchers = '/vouchers';
+  static const notifications = '/notifications';
+  static const language = '/language';
 
   // agent
   static const agentHome = '/agent';
@@ -30,6 +33,10 @@ abstract final class Routes {
   static const agentHistory = '/agent/history';
   static const agentOffer = '/agent/offer/:id';
   static String agentOfferPath(String id) => '/agent/offer/$id';
+
+  // vendor portal (shop owner)
+  static const vendorPortal = '/portal';
+  static const vendorPortalMenu = '/portal/menu';
 
   // admin
   static const adminDashboard = '/admin';

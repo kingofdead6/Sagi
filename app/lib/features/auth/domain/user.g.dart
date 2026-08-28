@@ -37,6 +37,7 @@ const _$UserRoleEnumMap = {
   UserRole.customer: 'customer',
   UserRole.agent: 'agent',
   UserRole.admin: 'admin',
+  UserRole.vendor: 'vendor',
 };
 
 _AuthSession _$AuthSessionFromJson(Map<String, dynamic> json) => _AuthSession(

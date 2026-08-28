@@ -4,6 +4,7 @@ import 'package:saji/app/theme/spacing.dart';
 import 'package:saji/app/theme/text_styles.dart';
 import 'package:saji/app/theme/tokens.dart';
 import 'package:saji/core/l10n_ext.dart';
+import 'package:saji/core/widgets/app_logo.dart';
 import 'package:saji/features/auth/presentation/auth_controller.dart';
 
 /// Restores the stored session before the router decides where to go.
@@ -33,16 +34,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 108,
-              height: 108,
-              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-              child: const Icon(
-                Icons.delivery_dining_rounded,
-                size: 56,
-                color: AppColors.primaryGreenDeep,
-              ),
-            ),
+            const AppLogo.mark(size: 108, onWhiteCircle: true),
             Gap.xl,
             Text(
               l10n.appName,

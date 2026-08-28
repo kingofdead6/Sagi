@@ -157,6 +157,22 @@ class AdminRepository {
           parse: (data) => Vendor.fromJson(data as Map<String, dynamic>),
         );
 
+  /// Gives a shop its own login. The owner can then manage their menu only.
+  Future<Result<void>> createVendorAccount(
+    String vendorId, {
+    required String fullName,
+    required String phone,
+    required String password,
+  }) =>
+      _client.post<void>(
+        Api.adminVendorAccount(vendorId),
+        body: {'fullName': fullName, 'phone': phone, 'password': password},
+        parse: (_) {},
+      );
+
+  Future<Result<void>> revokeVendorAccount(String vendorId) =>
+      _client.delete<void>(Api.adminVendorAccount(vendorId), parse: (_) {});
+
   Future<Result<void>> deleteVendor(String id) =>
       _client.delete<void>(Api.adminVendor(id), parse: (_) {});
 

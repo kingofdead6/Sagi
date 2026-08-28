@@ -17,6 +17,7 @@ import { vendorRouter } from './modules/vendors/vendor.routes';
 import { productRouter } from './modules/products/product.routes';
 import { offerRouter } from './modules/offers/offer.routes';
 import { voucherRouter } from './modules/vouchers/voucher.routes';
+import { vendorPortalRouter } from './modules/vendors/portal.routes';
 import { orderRouter } from './modules/orders/order.routes';
 import { agentRouter } from './modules/agents/agent.routes';
 import { adminRouter } from './modules/admin/admin.routes';
@@ -54,6 +55,8 @@ export function createApp(): Express {
   api.use('/vouchers', voucherRouter);
   api.use('/orders', orderRouter);
   api.use('/agent', agentRouter);
+  // The shop owner's own portal: their menu and nothing else.
+  api.use('/portal', vendorPortalRouter);
   api.use('/admin', adminRouter);
   api.use('/uploads', uploadRouter);
 

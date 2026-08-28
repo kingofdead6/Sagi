@@ -502,5 +502,81 @@
   "adminImagePick": "اضغط لاختيار صورة",
   "adminImageRemove": "حذف الصورة",
   "adminProductImage": "صورة المنتج",
-  "adminOfferImage": "صورة العرض"
+  "adminOfferImage": "صورة العرض",
+  "vouchersEmptyTitle": "لا توجد قسائم",
+  "vouchersEmptyMessage": "ستظهر هنا القسائم المتاحة لك",
+  "vouchersCopy": "نسخ الرمز",
+  "vouchersFreeDelivery": "توصيل مجاني",
+  "vouchersCopied": "تم نسخ {code}",
+  "@vouchersCopied": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "vouchersMinOrder": "الحد الأدنى للطلب {amount}",
+  "@vouchersMinOrder": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "vouchersExpires": "تنتهي في {date}",
+  "@vouchersExpires": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "vouchersPercentOff": "خصم {value}%",
+  "@vouchersPercentOff": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "vouchersAmountOff": "خصم {amount}",
+  "@vouchersAmountOff": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationsCategories": "أنواع الإشعارات",
+  "notificationsOrderUpdates": "تحديثات الطلب",
+  "notificationsOrderUpdatesHint": "إشعار عند تغيّر حالة طلبك",
+  "notificationsPromotions": "العروض",
+  "notificationsPromotionsHint": "تخفيضات وقسائم جديدة",
+  "notificationsNewVendors": "متاجر جديدة",
+  "notificationsNewVendorsHint": "عند إضافة متجر قريب منك",
+  "notificationsEnabled": "الإشعارات مفعّلة",
+  "notificationsEnabledHint": "ستصلك تنبيهات حسب اختيارك",
+  "notificationsDisabled": "الإشعارات موقوفة",
+  "notificationsDisabledHint": "فعّلها حتى تصلك تحديثات طلبك",
+  "notificationsEnable": "تفعيل",
+  "languageHint": "تُطبَّق اللغة على التطبيق كامل",
+  "portalTitle": "متجري",
+  "portalOpen": "المتجر مفتوح — نستقبل الطلبات",
+  "portalClosed": "المتجر مغلق — لا نستقبل الطلبات",
+  "portalSections": "الأقسام",
+  "portalAddSection": "إضافة قسم",
+  "portalSectionName": "اسم القسم",
+  "portalDeleteSectionHint": "سيتم حذف القسم، وتبقى منتجاته بدون قسم",
+  "portalAddProduct": "منتج جديد",
+  "portalEditProduct": "تعديل المنتج",
+  "portalUnsectioned": "بدون قسم",
+  "portalUnavailable": "غير متوفر",
+  "portalEmptyTitle": "القائمة فارغة",
+  "portalEmptyMessage": "أضف أقسامك ومنتجاتك ليراها الزبائن",
+  "adminVendorAccount": "حساب المتجر",
+  "adminVendorAccountCreate": "إنشاء حساب دخول",
+  "adminVendorAccountExists": "لهذا المتجر حساب دخول",
+  "adminVendorAccountNone": "لا يوجد حساب دخول",
+  "adminVendorAccountHint": "يدخل صاحب المتجر ليدير قائمته فقط",
+  "adminVendorAccountRevoke": "حذف الحساب"
 }

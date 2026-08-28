@@ -6,6 +6,7 @@ import 'package:saji/app/theme/spacing.dart';
 import 'package:saji/app/theme/text_styles.dart';
 import 'package:saji/app/theme/tokens.dart';
 import 'package:saji/core/l10n_ext.dart';
+import 'package:saji/features/profile/presentation/settings_controller.dart';
 import 'package:saji/core/phone.dart';
 import 'package:saji/features/auth/presentation/auth_controller.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -101,7 +102,7 @@ class ProfileScreen extends ConsumerWidget {
               _Tile(
                 icon: Icons.confirmation_num_outlined,
                 label: l10n.profileVouchers,
-                onTap: () => _showVouchersInfo(context),
+                onTap: () => context.push(Routes.vouchers),
               ),
             ],
           ),
@@ -112,12 +113,16 @@ class ProfileScreen extends ConsumerWidget {
               _Tile(
                 icon: Icons.notifications_none_rounded,
                 label: l10n.profileNotifications,
-                onTap: () => _openAppSettings(context),
+                onTap: () => context.push(Routes.notifications),
               ),
               _Tile(
                 icon: Icons.language_rounded,
                 label: l10n.profileLanguage,
-                trailing: Text('العربية', style: AppText.meta),
+                trailing: Text(
+                  ref.watch(localeControllerProvider.notifier).language.label,
+                  style: AppText.meta,
+                ),
+                onTap: () => context.push(Routes.language),
               ),
               _Tile(
                 icon: Icons.headset_mic_outlined,
@@ -160,19 +165,6 @@ class ProfileScreen extends ConsumerWidget {
           ),
         ],
       ),
-    );
-  }
-
-  void _showVouchersInfo(BuildContext context) {
-    final l10n = context.l10n;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.checkoutVoucherHint)),
-    );
-  }
-
-  void _openAppSettings(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.l10n.profileNotifications)),
     );
   }
 

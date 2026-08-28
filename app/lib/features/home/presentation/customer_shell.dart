@@ -32,16 +32,19 @@ class CustomerShell extends ConsumerWidget {
       backgroundColor: AppColors.background,
       extendBody: true,
       body: body,
-      floatingActionButton: cartCount == 0
-          ? null
-          : FloatingActionButton.extended(
-              heroTag: 'cart',
-              backgroundColor: AppColors.primaryGreen,
-              foregroundColor: Colors.white,
-              onPressed: () => context.push(Routes.cart),
-              icon: const Icon(Icons.shopping_bag_rounded),
-              label: Text(l10n.cartItemCount(cartCount)),
-            ),
+      // The cart is always reachable — an empty one still opens, so customers
+      // can see it is empty rather than wonder where it went.
+      floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'cart',
+        backgroundColor:
+            cartCount == 0 ? AppColors.textSecondary : AppColors.primaryGreen,
+        foregroundColor: Colors.white,
+        onPressed: () => context.push(Routes.cart),
+        icon: const Icon(Icons.shopping_bag_rounded),
+        label: Text(
+          cartCount == 0 ? l10n.cartTitle : l10n.cartItemCount(cartCount),
+        ),
+      ),
       bottomNavigationBar: AppBottomNav(
         currentIndex: tab,
         items: [

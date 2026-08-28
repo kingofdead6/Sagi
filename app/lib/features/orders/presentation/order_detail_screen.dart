@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:saji/app/routes.dart';
 import 'package:saji/app/theme/spacing.dart';
 import 'package:saji/app/theme/text_styles.dart';
 import 'package:saji/app/theme/tokens.dart';
@@ -40,6 +42,14 @@ class OrderDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         title: Text(l10n.ordersDetails, style: AppText.header),
+        // Reached from a push notification the stack can be empty, and the
+        // default AppBar would then show no way back at all.
+        leading: context.canPop()
+            ? null
+            : IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => context.go(Routes.orders),
+              ),
       ),
       body: order.when(
         loading: () => const AppSkeletonList(itemHeight: 120, count: 4),

@@ -295,9 +295,151 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
               value: _isFeatured,
               onChanged: (value) => setState(() => _isFeatured = value),
             ),
+
+            // Only an existing shop can be given a login — the account is
+            // attached to the vendor document, so it must be saved first.
+            if (widget.vendorId != null) ...[
+              Gap.lg,
+              Text(l10n.adminVendorAccount, style: AppText.adminTableHead),
+              Gap.xs,
+              Text(
+                l10n.adminVendorAccountHint,
+                style: AppText.adminTable.copyWith(color: AppColors.textMuted),
+              ),
+              Gap.sm,
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => _createAccount(widget.vendorId!),
+                      icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
+                      label: Text(l10n.adminVendorAccountCreate),
+                    ),
+                  ),
+                  Gap.wSm,
+                  IconButton(
+                    tooltip: l10n.adminVendorAccountRevoke,
+                    icon: const Icon(Icons.person_remove_rounded, color: AppColors.danger),
+                    onPressed: () => _revokeAccount(widget.vendorId!),
+                  ),
+                ],
+              ),
+            ],
           ],
         ),
       ),
     );
+  }
+
+  /// Collects credentials and attaches a login to this shop. The server
+  /// rejects a phone that is already registered, or a shop that already has
+  /// an account, so no pre-check is needed here.
+  Future<void> _createAccount(String vendorId) async {
+    final l10n = context.l10n;
+    final name = TextEditingController(text: _name.text);
+    final phone = TextEditingController();
+    final password = TextEditingController();
+
+    final submit = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.adminVendorAccountCreate, style: AppText.adminSubheading),
+        content: SizedBox(
+          width: 360,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AdminField(label: l10n.authFullName, controller: name),
+              AdminField(
+                label: l10n.authPhone,
+                controller: phone,
+                keyboardType: TextInputType.phone,
+              ),
+              AdminField(label: l10n.authPassword, controller: password),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.commonSave),
+          ),
+        ],
+      ),
+    );
+
+    final ok = (submit ?? false) &&
+        name.text.trim().isNotEmpty &&
+        phone.text.trim().isNotEmpty &&
+        password.text.isNotEmpty;
+
+    final values = (
+      name: name.text.trim(),
+      phone: phone.text.trim(),
+      password: password.text,
+    );
+    for (final controller in [name, phone, password]) {
+      controller.dispose();
+    }
+    if (!ok || !mounted) return;
+
+    final result = await ref.read(adminRepositoryProvider).createVendorAccount(
+          vendorId,
+          fullName: values.name,
+          phone: values.phone,
+          password: values.password,
+        );
+    if (!mounted) return;
+
+    switch (result) {
+      case Ok():
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.adminVendorAccountExists)),
+        );
+      case Err(:final failure):
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.failureMessage(failure))),
+        );
+    }
+  }
+
+  Future<void> _revokeAccount(String vendorId) async {
+    final l10n = context.l10n;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.adminVendorAccountRevoke, style: AppText.adminSubheading),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
+            child: Text(l10n.commonDelete),
+          ),
+        ],
+      ),
+    );
+    if (!(confirmed ?? false) || !mounted) return;
+
+    final result = await ref.read(adminRepositoryProvider).revokeVendorAccount(vendorId);
+    if (!mounted) return;
+
+    switch (result) {
+      case Ok():
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.adminVendorAccountNone)),
+        );
+      case Err(:final failure):
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.failureMessage(failure))),
+        );
+    }
   }
 }

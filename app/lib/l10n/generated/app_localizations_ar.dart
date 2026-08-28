@@ -1216,4 +1216,138 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get adminOfferImage => 'صورة العرض';
+
+  @override
+  String get vouchersEmptyTitle => 'لا توجد قسائم';
+
+  @override
+  String get vouchersEmptyMessage => 'ستظهر هنا القسائم المتاحة لك';
+
+  @override
+  String get vouchersCopy => 'نسخ الرمز';
+
+  @override
+  String get vouchersFreeDelivery => 'توصيل مجاني';
+
+  @override
+  String vouchersCopied(String code) {
+    return 'تم نسخ $code';
+  }
+
+  @override
+  String vouchersMinOrder(String amount) {
+    return 'الحد الأدنى للطلب $amount';
+  }
+
+  @override
+  String vouchersExpires(String date) {
+    return 'تنتهي في $date';
+  }
+
+  @override
+  String vouchersPercentOff(String value) {
+    return 'خصم $value%';
+  }
+
+  @override
+  String vouchersAmountOff(String amount) {
+    return 'خصم $amount';
+  }
+
+  @override
+  String get notificationsCategories => 'أنواع الإشعارات';
+
+  @override
+  String get notificationsOrderUpdates => 'تحديثات الطلب';
+
+  @override
+  String get notificationsOrderUpdatesHint => 'إشعار عند تغيّر حالة طلبك';
+
+  @override
+  String get notificationsPromotions => 'العروض';
+
+  @override
+  String get notificationsPromotionsHint => 'تخفيضات وقسائم جديدة';
+
+  @override
+  String get notificationsNewVendors => 'متاجر جديدة';
+
+  @override
+  String get notificationsNewVendorsHint => 'عند إضافة متجر قريب منك';
+
+  @override
+  String get notificationsEnabled => 'الإشعارات مفعّلة';
+
+  @override
+  String get notificationsEnabledHint => 'ستصلك تنبيهات حسب اختيارك';
+
+  @override
+  String get notificationsDisabled => 'الإشعارات موقوفة';
+
+  @override
+  String get notificationsDisabledHint => 'فعّلها حتى تصلك تحديثات طلبك';
+
+  @override
+  String get notificationsEnable => 'تفعيل';
+
+  @override
+  String get languageHint => 'تُطبَّق اللغة على التطبيق كامل';
+
+  @override
+  String get portalTitle => 'متجري';
+
+  @override
+  String get portalOpen => 'المتجر مفتوح — نستقبل الطلبات';
+
+  @override
+  String get portalClosed => 'المتجر مغلق — لا نستقبل الطلبات';
+
+  @override
+  String get portalSections => 'الأقسام';
+
+  @override
+  String get portalAddSection => 'إضافة قسم';
+
+  @override
+  String get portalSectionName => 'اسم القسم';
+
+  @override
+  String get portalDeleteSectionHint =>
+      'سيتم حذف القسم، وتبقى منتجاته بدون قسم';
+
+  @override
+  String get portalAddProduct => 'منتج جديد';
+
+  @override
+  String get portalEditProduct => 'تعديل المنتج';
+
+  @override
+  String get portalUnsectioned => 'بدون قسم';
+
+  @override
+  String get portalUnavailable => 'غير متوفر';
+
+  @override
+  String get portalEmptyTitle => 'القائمة فارغة';
+
+  @override
+  String get portalEmptyMessage => 'أضف أقسامك ومنتجاتك ليراها الزبائن';
+
+  @override
+  String get adminVendorAccount => 'حساب المتجر';
+
+  @override
+  String get adminVendorAccountCreate => 'إنشاء حساب دخول';
+
+  @override
+  String get adminVendorAccountExists => 'لهذا المتجر حساب دخول';
+
+  @override
+  String get adminVendorAccountNone => 'لا يوجد حساب دخول';
+
+  @override
+  String get adminVendorAccountHint => 'يدخل صاحب المتجر ليدير قائمته فقط';
+
+  @override
+  String get adminVendorAccountRevoke => 'حذف الحساب';
 }

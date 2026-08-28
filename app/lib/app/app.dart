@@ -5,6 +5,7 @@ import 'package:saji/app/router.dart';
 import 'package:saji/app/theme/app_theme.dart';
 import 'package:saji/features/auth/domain/user.dart';
 import 'package:saji/features/auth/presentation/auth_controller.dart';
+import 'package:saji/features/profile/presentation/settings_controller.dart';
 import 'package:saji/l10n/generated/app_localizations.dart';
 
 class SajiApp extends ConsumerWidget {
@@ -24,9 +25,9 @@ class SajiApp extends ConsumerWidget {
       routerConfig: router,
       theme: isAdmin ? AppTheme.admin : AppTheme.customer,
 
-      // Arabic RTL is the only shipped locale at v1. The direction is set once
-      // here — never per widget.
-      locale: const Locale('ar'),
+      // Arabic is the default; the language screen can switch to fr/en and the
+      // choice persists. Direction follows the locale — never set per widget.
+      locale: ref.watch(localeControllerProvider),
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [
         AppLocalizations.delegate,

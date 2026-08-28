@@ -55,6 +55,7 @@ abstract final class Api {
   static String orderCancel(String id) => '$prefix/orders/$id/cancel';
   static String orderRating(String id) => '$prefix/orders/$id/rating';
   static const voucherValidate = '$prefix/vouchers/validate';
+  static const myVouchers = '$prefix/vouchers/mine';
 
   // agent
   static const agentStatus = '$prefix/agent/status';
@@ -68,6 +69,14 @@ abstract final class Api {
   static const agentStats = '$prefix/agent/stats';
   static const agentLocation = '$prefix/agent/location';
   static const agentLocationBatch = '$prefix/agent/location/batch';
+
+  // vendor portal — the shop owner's own menu
+  static const portalMe = '$prefix/portal/me';
+  static const portalSections = '$prefix/portal/sections';
+  static String portalSection(String id) => '$prefix/portal/sections/$id';
+  static const portalProducts = '$prefix/portal/products';
+  static String portalProduct(String id) => '$prefix/portal/products/$id';
+  static const portalProductsReorder = '$prefix/portal/products/reorder';
 
   // admin
   static const adminStats = '$prefix/admin/stats';
@@ -83,6 +92,7 @@ abstract final class Api {
   static const adminVendors = '$prefix/admin/vendors';
   static String adminVendor(String id) => '$prefix/admin/vendors/$id';
   static String adminVendorSections(String id) => '$prefix/admin/vendors/$id/sections';
+  static String adminVendorAccount(String id) => '$prefix/admin/vendors/$id/account';
   static String adminSection(String id) => '$prefix/admin/sections/$id';
   static const adminProducts = '$prefix/admin/products';
   static String adminProduct(String id) => '$prefix/admin/products/$id';

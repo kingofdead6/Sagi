@@ -66,6 +66,7 @@ class AdminAgentsPage extends ConsumerWidget {
                 AdminColumn(
                   label: l10n.authFullName,
                   flex: 2,
+                  minWidth: 180,
                   build: (u) => Text(u.fullName, style: AppText.adminTable),
                 ),
                 AdminColumn(
@@ -262,6 +263,7 @@ class AdminCustomersPage extends ConsumerWidget {
           AdminColumn(
             label: l10n.authFullName,
             flex: 2,
+            minWidth: 180,
             build: (u) => Text(u.fullName, style: AppText.adminTable),
           ),
           AdminColumn(

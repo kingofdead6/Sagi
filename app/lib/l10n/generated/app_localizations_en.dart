@@ -1216,4 +1216,140 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminOfferImage => 'Offer image';
+
+  @override
+  String get vouchersEmptyTitle => 'No vouchers';
+
+  @override
+  String get vouchersEmptyMessage => 'Your available vouchers will appear here';
+
+  @override
+  String get vouchersCopy => 'Copy code';
+
+  @override
+  String get vouchersFreeDelivery => 'Free delivery';
+
+  @override
+  String vouchersCopied(String code) {
+    return 'Copied $code';
+  }
+
+  @override
+  String vouchersMinOrder(String amount) {
+    return 'Minimum order $amount';
+  }
+
+  @override
+  String vouchersExpires(String date) {
+    return 'Expires $date';
+  }
+
+  @override
+  String vouchersPercentOff(String value) {
+    return '$value% off';
+  }
+
+  @override
+  String vouchersAmountOff(String amount) {
+    return '$amount off';
+  }
+
+  @override
+  String get notificationsCategories => 'Categories';
+
+  @override
+  String get notificationsOrderUpdates => 'Order updates';
+
+  @override
+  String get notificationsOrderUpdatesHint =>
+      'Alerts when your order status changes';
+
+  @override
+  String get notificationsPromotions => 'Promotions';
+
+  @override
+  String get notificationsPromotionsHint => 'Discounts and new vouchers';
+
+  @override
+  String get notificationsNewVendors => 'New stores';
+
+  @override
+  String get notificationsNewVendorsHint => 'When a store opens near you';
+
+  @override
+  String get notificationsEnabled => 'Notifications on';
+
+  @override
+  String get notificationsEnabledHint => 'You will get the alerts you choose';
+
+  @override
+  String get notificationsDisabled => 'Notifications off';
+
+  @override
+  String get notificationsDisabledHint => 'Turn them on to follow your orders';
+
+  @override
+  String get notificationsEnable => 'Enable';
+
+  @override
+  String get languageHint => 'The language applies to the whole app';
+
+  @override
+  String get portalTitle => 'My store';
+
+  @override
+  String get portalOpen => 'Open — accepting orders';
+
+  @override
+  String get portalClosed => 'Closed — not accepting orders';
+
+  @override
+  String get portalSections => 'Sections';
+
+  @override
+  String get portalAddSection => 'Add section';
+
+  @override
+  String get portalSectionName => 'Section name';
+
+  @override
+  String get portalDeleteSectionHint =>
+      'The section is deleted; its products stay without one';
+
+  @override
+  String get portalAddProduct => 'New product';
+
+  @override
+  String get portalEditProduct => 'Edit product';
+
+  @override
+  String get portalUnsectioned => 'No section';
+
+  @override
+  String get portalUnavailable => 'Unavailable';
+
+  @override
+  String get portalEmptyTitle => 'Menu is empty';
+
+  @override
+  String get portalEmptyMessage => 'Add your sections and products';
+
+  @override
+  String get adminVendorAccount => 'Store account';
+
+  @override
+  String get adminVendorAccountCreate => 'Create login';
+
+  @override
+  String get adminVendorAccountExists => 'This store has a login';
+
+  @override
+  String get adminVendorAccountNone => 'No login yet';
+
+  @override
+  String get adminVendorAccountHint =>
+      'The owner signs in to manage their menu only';
+
+  @override
+  String get adminVendorAccountRevoke => 'Remove login';
 }

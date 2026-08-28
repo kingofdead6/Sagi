@@ -31,6 +31,14 @@ class CartScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         title: Text(l10n.cartTitle, style: AppText.header),
+        // The cart FAB is reachable from every tab, so guarantee a way back
+        // even when this was opened without anything beneath it.
+        leading: context.canPop()
+            ? null
+            : IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => context.go(Routes.home),
+              ),
         actions: [
           if (cart.isNotEmpty)
             IconButton(

@@ -127,6 +127,15 @@ export const createAgentSchema = z
   })
   .strict();
 
+/** Credentials for the login attached to an existing shop. */
+export const createVendorAccountSchema = z
+  .object({
+    fullName: z.string().trim().min(2).max(80),
+    phone: phoneField,
+    password: passwordField,
+  })
+  .strict();
+
 export const updateAgentSchema = z
   .object({
     fullName: z.string().trim().min(2).max(80).optional(),

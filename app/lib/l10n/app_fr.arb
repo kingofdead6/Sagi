@@ -502,5 +502,81 @@
   "adminImagePick": "Choisir une image",
   "adminImageRemove": "Supprimer l'image",
   "adminProductImage": "Image du produit",
-  "adminOfferImage": "Image de l'offre"
+  "adminOfferImage": "Image de l'offre",
+  "vouchersEmptyTitle": "Aucun coupon",
+  "vouchersEmptyMessage": "Vos coupons disponibles apparaîtront ici",
+  "vouchersCopy": "Copier le code",
+  "vouchersFreeDelivery": "Livraison gratuite",
+  "vouchersCopied": "{code} copié",
+  "@vouchersCopied": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "vouchersMinOrder": "Commande minimum {amount}",
+  "@vouchersMinOrder": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "vouchersExpires": "Expire le {date}",
+  "@vouchersExpires": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "vouchersPercentOff": "{value}% de réduction",
+  "@vouchersPercentOff": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "vouchersAmountOff": "{amount} de réduction",
+  "@vouchersAmountOff": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationsCategories": "Catégories",
+  "notificationsOrderUpdates": "Suivi de commande",
+  "notificationsOrderUpdatesHint": "Alerte à chaque changement de statut",
+  "notificationsPromotions": "Promotions",
+  "notificationsPromotionsHint": "Réductions et nouveaux coupons",
+  "notificationsNewVendors": "Nouveaux commerces",
+  "notificationsNewVendorsHint": "Quand un commerce ouvre près de vous",
+  "notificationsEnabled": "Notifications activées",
+  "notificationsEnabledHint": "Vous recevrez les alertes choisies",
+  "notificationsDisabled": "Notifications désactivées",
+  "notificationsDisabledHint": "Activez-les pour suivre vos commandes",
+  "notificationsEnable": "Activer",
+  "languageHint": "La langue s'applique à toute l'application",
+  "portalTitle": "Mon commerce",
+  "portalOpen": "Ouvert — commandes acceptées",
+  "portalClosed": "Fermé — commandes suspendues",
+  "portalSections": "Sections",
+  "portalAddSection": "Ajouter une section",
+  "portalSectionName": "Nom de la section",
+  "portalDeleteSectionHint": "La section sera supprimée ; ses produits resteront sans section",
+  "portalAddProduct": "Nouveau produit",
+  "portalEditProduct": "Modifier le produit",
+  "portalUnsectioned": "Sans section",
+  "portalUnavailable": "Indisponible",
+  "portalEmptyTitle": "Menu vide",
+  "portalEmptyMessage": "Ajoutez vos sections et produits",
+  "adminVendorAccount": "Compte du commerce",
+  "adminVendorAccountCreate": "Créer un identifiant",
+  "adminVendorAccountExists": "Ce commerce a un identifiant",
+  "adminVendorAccountNone": "Aucun identifiant",
+  "adminVendorAccountHint": "Le propriétaire gère uniquement son menu",
+  "adminVendorAccountRevoke": "Supprimer l'identifiant"
 }

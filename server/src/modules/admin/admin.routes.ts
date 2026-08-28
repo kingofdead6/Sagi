@@ -28,6 +28,7 @@ import * as settingsService from '../settings/settings.service';
 import {
   adminOrdersQuerySchema,
   adminStatusSchema,
+  createVendorAccountSchema,
   assignSchema,
   availableAgentsQuerySchema,
   bulkAvailabilitySchema,
@@ -264,6 +265,54 @@ adminRouter.delete(
     );
     if (!doc) throw ApiError.notFound('المتجر غير موجود');
     return ok(res, doc.toJSON(), 'تم تعطيل المتجر');
+  }),
+);
+
+/**
+ * Give a shop a login.
+ *
+ * Creates a 'vendor' user and points the vendor document at it. The owner can
+ * then sign in to the portal and manage their own menu — nothing else. Shops
+ * without an account keep working exactly as before; the admin edits them.
+ */
+adminRouter.post(
+  '/vendors/:id/account',
+  validate({ params: idParams, body: createVendorAccountSchema }),
+  asyncHandler(async (req, res) => {
+    const vendor = await Vendor.findById(req.params.id);
+    if (!vendor) throw ApiError.notFound('المتجر غير موجود');
+    if (vendor.owner) throw ApiError.conflict('هذا المتجر لديه حساب بالفعل');
+
+    const existing = await User.findOne({ phone: req.body.phone });
+    if (existing) throw ApiError.conflict('رقم الهاتف مسجّل من قبل');
+
+    const user = await User.create({
+      fullName: req.body.fullName,
+      phone: req.body.phone,
+      passwordHash: await hashPassword(req.body.password),
+      role: 'vendor',
+    });
+
+    vendor.owner = user._id;
+    await vendor.save();
+
+    return created(res, { ...user.toJSON(), vendor: vendor._id }, 'تم إنشاء حساب المتجر');
+  }),
+);
+
+/** Revoke a shop's login. The shop itself and its menu are untouched. */
+adminRouter.delete(
+  '/vendors/:id/account',
+  validate({ params: idParams }),
+  asyncHandler(async (req, res) => {
+    const vendor = await Vendor.findById(req.params.id);
+    if (!vendor) throw ApiError.notFound('المتجر غير موجود');
+    if (!vendor.owner) throw ApiError.notFound('لا يوجد حساب لهذا المتجر');
+
+    await User.findByIdAndDelete(vendor.owner);
+    vendor.owner = null;
+    await vendor.save();
+    return ok(res, null, 'تم حذف حساب المتجر');
   }),
 );
 

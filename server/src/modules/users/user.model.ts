@@ -1,7 +1,9 @@
 import { Schema, model, type Document, type Types } from 'mongoose';
 import type { GeoPoint } from '../../utils/geo';
 
-export const ROLES = ['customer', 'agent', 'admin'] as const;
+// 'vendor' is a shop or restaurant owner: they sign in to manage their own
+// menu and nothing else. Created by an admin — vendors cannot self-register.
+export const ROLES = ['customer', 'agent', 'admin', 'vendor'] as const;
 export type Role = (typeof ROLES)[number];
 
 export interface ImageRef {

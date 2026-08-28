@@ -6,6 +6,7 @@ import 'package:saji/app/theme/spacing.dart';
 import 'package:saji/app/theme/text_styles.dart';
 import 'package:saji/app/theme/tokens.dart';
 import 'package:saji/core/l10n_ext.dart';
+import 'package:saji/core/widgets/app_logo.dart';
 import 'package:saji/core/phone.dart';
 import 'package:saji/core/widgets/primary_button.dart';
 import 'package:saji/features/auth/presentation/auth_controller.dart';
@@ -69,19 +70,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Center(
-                      child: Container(
-                        width: 88,
-                        height: 88,
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryGreen.withValues(alpha: 0.12),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.delivery_dining_rounded,
-                          size: 44,
-                          color: AppColors.primaryGreen,
-                        ),
-                      ),
+                      child: const AppLogo.mark(size: 132),
                     ),
                     Gap.xl,
                     Text(l10n.welcomeTitle, style: AppText.sectionTitle, textAlign: TextAlign.center),

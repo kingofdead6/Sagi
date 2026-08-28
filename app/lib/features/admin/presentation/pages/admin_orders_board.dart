@@ -56,6 +56,7 @@ class AdminOrdersBoard extends ConsumerWidget {
             AdminColumn(
               label: l10n.adminCustomers,
               flex: 2,
+              minWidth: 200,
               build: (order) => Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -76,6 +77,7 @@ class AdminOrdersBoard extends ConsumerWidget {
             AdminColumn(
               label: l10n.adminVendors,
               flex: 2,
+              minWidth: 160,
               build: (order) => Text(
                 order.vendor?.name ?? '—',
                 style: AppText.adminTable,
@@ -86,6 +88,7 @@ class AdminOrdersBoard extends ConsumerWidget {
             AdminColumn(
               label: l10n.adminAgents,
               flex: 2,
+              minWidth: 160,
               build: (order) => Text(
                 order.agent?.fullName ?? '—',
                 style: AppText.adminTable,

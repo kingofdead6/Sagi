@@ -74,6 +74,7 @@ class AdminVendorsPage extends ConsumerWidget {
                       AdminColumn(
                         label: l10n.adminVendorName,
                         flex: 2,
+                        minWidth: 180,
                         build: (v) => Text(v.name, style: AppText.adminTable),
                       ),
                       AdminColumn(
@@ -738,6 +739,7 @@ class AdminOffersPage extends ConsumerWidget {
                 AdminColumn(
                   label: l10n.adminOfferTitle,
                   flex: 2,
+                  minWidth: 180,
                   build: (o) => Text(o.title, style: AppText.adminTable),
                 ),
                 AdminColumn(
@@ -1246,6 +1248,7 @@ class AdminCategoriesPage extends ConsumerWidget {
           AdminColumn(
             label: l10n.adminCategories,
             flex: 2,
+            minWidth: 160,
             build: (c) => Text(c.nameAr, style: AppText.adminTable),
           ),
           AdminColumn(

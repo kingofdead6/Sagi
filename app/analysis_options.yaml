@@ -1,0 +1,26 @@
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  errors:
+    # Arabic copy lives in ARB files; the analyzer's directive ordering and
+    # public-member docs rules are noise for a product app.
+    public_member_api_docs: ignore
+    lines_longer_than_80_chars: ignore
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "lib/l10n/generated/**"
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+
+linter:
+  rules:
+    public_member_api_docs: false
+    lines_longer_than_80_chars: false
+    always_use_package_imports: false
+    sort_pub_dependencies: false
+    avoid_redundant_argument_values: false
+    flutter_style_todos: false
+    one_member_abstracts: false

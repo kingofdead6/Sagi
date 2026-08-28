@@ -15,10 +15,7 @@ app/.flutter-plugins-dependencies
 app/ios/Pods/
 app/android/.gradle/
 app/android/local.properties
-app/**/*.g.dart
-app/**/*.freezed.dart
 app/**/generated_plugin_registrant.dart
-app/lib/l10n/generated/
 
 # OS / editors
 .DS_Store

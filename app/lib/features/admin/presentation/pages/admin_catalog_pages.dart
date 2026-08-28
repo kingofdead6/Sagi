@@ -120,6 +120,15 @@ class AdminVendorsPage extends ConsumerWidget {
 
 final adminProductVendorProvider = StateProvider<String?>((ref) => null);
 
+final adminSectionsProvider =
+    FutureProvider.autoDispose.family<List<MenuSection>, String>((ref, vendorId) async {
+  final result = await ref.watch(adminRepositoryProvider).sections(vendorId);
+  return switch (result) {
+    Ok(:final value) => value,
+    Err(:final failure) => throw failure,
+  };
+});
+
 final adminProductsProvider = FutureProvider.autoDispose<Paged<Product>>((ref) async {
   final vendorId = ref.watch(adminProductVendorProvider);
   final result = await ref.watch(adminRepositoryProvider).products(vendorId: vendorId);
@@ -139,72 +148,68 @@ class AdminProductsPage extends ConsumerWidget {
     final vendors = ref.watch(adminVendorsProvider).valueOrNull;
     final vendorId = ref.watch(adminProductVendorProvider);
 
-    return Column(
+    return Row(
       children: [
-        Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Row(
+        Expanded(
+          child: Column(
             children: [
-              SizedBox(
-                width: 260,
-                child: DropdownButtonFormField<String?>(
-                  initialValue: vendorId,
-                  style: AppText.adminTable,
-                  decoration: InputDecoration(labelText: l10n.adminVendors),
-                  items: [
-                    DropdownMenuItem(value: null, child: Text(l10n.filterAll)),
-                    for (final vendor in vendors?.items ?? const <Vendor>[])
-                      DropdownMenuItem(value: vendor.id, child: Text(vendor.name)),
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 260,
+                      child: DropdownButtonFormField<String?>(
+                        initialValue: vendorId,
+                        style: AppText.adminTable,
+                        decoration: InputDecoration(labelText: l10n.adminVendors),
+                        items: [
+                          DropdownMenuItem(value: null, child: Text(l10n.filterAll)),
+                          for (final vendor in vendors?.items ?? const <Vendor>[])
+                            DropdownMenuItem(value: vendor.id, child: Text(vendor.name)),
+                        ],
+                        onChanged: (value) =>
+                            ref.read(adminProductVendorProvider.notifier).state = value,
+                      ),
+                    ),
+                    const Spacer(),
+                    FilledButton.icon(
+                      onPressed: () => _editProduct(context, ref, null, vendorId),
+                      icon: const Icon(Icons.add_rounded, size: 18),
+                      label: Text(l10n.adminProductNew),
+                    ),
                   ],
-                  onChanged: (value) =>
-                      ref.read(adminProductVendorProvider.notifier).state = value,
                 ),
               ),
-              const Spacer(),
-              FilledButton.icon(
-                onPressed: () => _editProduct(context, ref, null, vendorId),
-                icon: const Icon(Icons.add_rounded, size: 18),
-                label: Text(l10n.adminProductNew),
+              Expanded(
+                child: products.when(
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (error, _) => ErrorRetry(
+                    failure: error is Failure ? error : const Failure.unknown(),
+                    onRetry: () => ref.invalidate(adminProductsProvider),
+                  ),
+                  data: (page) {
+                    if (page.isEmpty) {
+                      return EmptyState(
+                        title: l10n.emptyTitle,
+                        icon: Icons.inventory_2_outlined,
+                        actionLabel: l10n.adminProductNew,
+                        onAction: () => _editProduct(context, ref, null, vendorId),
+                      );
+                    }
+                    // Reordering only makes sense within one vendor's menu.
+                    return _ProductList(
+                      products: page.items,
+                      canReorder: vendorId != null,
+                      onEdit: (product) => _editProduct(context, ref, product, vendorId),
+                    );
+                  },
+                ),
               ),
             ],
           ),
         ),
-        Expanded(
-          child: products.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, _) => ErrorRetry(
-              failure: error is Failure ? error : const Failure.unknown(),
-              onRetry: () => ref.invalidate(adminProductsProvider),
-            ),
-            data: (page) => AdminDataTable<Product>(
-              rows: page.items,
-              onRowTap: (product) => _editProduct(context, ref, product, vendorId),
-              emptyState: EmptyState(title: l10n.emptyTitle, icon: Icons.inventory_2_outlined),
-              columns: [
-                AdminColumn(
-                  label: l10n.adminProductName,
-                  flex: 2,
-                  build: (p) => Text(p.name, style: AppText.adminTable),
-                ),
-                AdminColumn(
-                  label: l10n.adminProductPrice,
-                  width: 120,
-                  build: (p) => PriceText(p.priceCentimes, style: AppText.adminTable),
-                ),
-                AdminColumn(
-                  label: l10n.adminProductOptions,
-                  width: 100,
-                  build: (p) => Text('${p.options.length}', style: AppText.adminTable),
-                ),
-                AdminColumn(
-                  label: l10n.adminProductAvailable,
-                  width: 130,
-                  build: (p) => _AvailabilityToggle(product: p),
-                ),
-              ],
-            ),
-          ),
-        ),
+        if (vendorId != null) _SectionsPanel(vendorId: vendorId),
       ],
     );
   }
@@ -220,6 +225,285 @@ class AdminProductsPage extends ConsumerWidget {
       builder: (context) => _ProductDialog(product: product, vendorId: vendorId),
     );
     if (saved ?? false) ref.invalidate(adminProductsProvider);
+  }
+}
+
+/// The product list. Filtered to one vendor it becomes drag-reorderable, and
+/// the new order is persisted through POST /admin/products/reorder.
+class _ProductList extends ConsumerStatefulWidget {
+  const _ProductList({
+    required this.products,
+    required this.canReorder,
+    required this.onEdit,
+  });
+
+  final List<Product> products;
+  final bool canReorder;
+  final void Function(Product product) onEdit;
+
+  @override
+  ConsumerState<_ProductList> createState() => _ProductListState();
+}
+
+class _ProductListState extends ConsumerState<_ProductList> {
+  late List<Product> _ordered = List.of(widget.products);
+  bool _saving = false;
+
+  @override
+  void didUpdateWidget(_ProductList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.products != widget.products) {
+      _ordered = List.of(widget.products);
+    }
+  }
+
+  Future<void> _persistOrder() async {
+    setState(() => _saving = true);
+    final result = await ref.read(adminRepositoryProvider).reorderProducts(
+          [
+            for (var i = 0; i < _ordered.length; i++) (id: _ordered[i].id, sortOrder: i),
+          ],
+        );
+    if (!mounted) return;
+    setState(() => _saving = false);
+
+    if (result case Err(:final failure)) {
+      // Put the list back the way the server still has it.
+      setState(() => _ordered = List.of(widget.products));
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(context.failureMessage(failure))));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
+    return Column(
+      children: [
+        if (_saving) const LinearProgressIndicator(minHeight: 2),
+        Expanded(
+          child: ReorderableListView.builder(
+            buildDefaultDragHandles: false,
+            itemCount: _ordered.length,
+            // onReorderItem already accounts for the removed item's index.
+            onReorderItem: (oldIndex, newIndex) {
+              if (!widget.canReorder) return;
+              setState(() => _ordered.insert(newIndex, _ordered.removeAt(oldIndex)));
+              _persistOrder();
+            },
+            itemBuilder: (context, index) {
+              final product = _ordered[index];
+              return Container(
+                key: ValueKey(product.id),
+                decoration: const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: AppColors.adminBorder, width: 0.5),
+                  ),
+                ),
+                child: ListTile(
+                  onTap: () => widget.onEdit(product),
+                  leading: widget.canReorder
+                      ? ReorderableDragStartListener(
+                          index: index,
+                          child: const Icon(
+                            Icons.drag_indicator_rounded,
+                            color: AppColors.textMuted,
+                          ),
+                        )
+                      : const Icon(Icons.inventory_2_outlined, color: AppColors.textMuted),
+                  title: Text(product.name, style: AppText.adminTable),
+                  subtitle: Text(
+                    product.options.isEmpty
+                        ? ''
+                        : '${product.options.length} ${l10n.adminProductOptions}',
+                    style: AppText.adminNav.copyWith(color: AppColors.textMuted),
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      PriceText(product.priceCentimes, style: AppText.adminTable),
+                      Gap.wLg,
+                      _AvailabilityToggle(product: product),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Menu sections for the selected vendor: create, delete, and see how the menu
+/// is grouped on the customer side.
+class _SectionsPanel extends ConsumerWidget {
+  const _SectionsPanel({required this.vendorId});
+
+  final String vendorId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final sections = ref.watch(adminSectionsProvider(vendorId));
+
+    return SizedBox(
+      width: 300,
+      child: Container(
+        decoration: const BoxDecoration(
+          color: AppColors.adminSurface,
+          border: Border(right: BorderSide(color: AppColors.adminBorder)),
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(l10n.adminSectionNew, style: AppText.adminSubheading),
+                  ),
+                  IconButton(
+                    tooltip: l10n.adminSectionNew,
+                    onPressed: () => _create(context, ref),
+                    icon: const Icon(Icons.add_rounded),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: sections.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, _) => ErrorRetry(
+                  failure: error is Failure ? error : const Failure.unknown(),
+                  compact: true,
+                  onRetry: () => ref.invalidate(adminSectionsProvider(vendorId)),
+                ),
+                data: (items) {
+                  if (items.isEmpty) {
+                    return EmptyState(
+                      title: l10n.emptyTitle,
+                      icon: Icons.list_alt_rounded,
+                      actionLabel: l10n.adminSectionNew,
+                      onAction: () => _create(context, ref),
+                    );
+                  }
+
+                  return ListView(
+                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    children: [
+                      for (final section in items)
+                        ListTile(
+                          dense: true,
+                          leading: const Icon(Icons.folder_outlined, size: 20),
+                          title: Text(section.name, style: AppText.adminTable),
+                          trailing: IconButton(
+                            tooltip: l10n.commonDelete,
+                            onPressed: () => _delete(context, ref, section),
+                            icon: const Icon(
+                              Icons.delete_outline_rounded,
+                              size: 18,
+                              color: AppColors.danger,
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _create(BuildContext context, WidgetRef ref) async {
+    final l10n = context.l10n;
+    final controller = TextEditingController();
+
+    final name = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.adminSectionNew, style: AppText.adminSubheading),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: InputDecoration(labelText: l10n.adminSectionName),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(controller.text.trim()),
+            child: Text(l10n.commonSave),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+
+    if (name == null || name.isEmpty || !context.mounted) return;
+
+    final existing = ref.read(adminSectionsProvider(vendorId)).valueOrNull ?? const [];
+    final result = await ref
+        .read(adminRepositoryProvider)
+        .createSection(vendorId, name, existing.length);
+    if (!context.mounted) return;
+
+    switch (result) {
+      case Ok():
+        ref.invalidate(adminSectionsProvider(vendorId));
+      case Err(:final failure):
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.failureMessage(failure))),
+        );
+    }
+  }
+
+  Future<void> _delete(BuildContext context, WidgetRef ref, MenuSection section) async {
+    final l10n = context.l10n;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.commonDelete, style: AppText.adminSubheading),
+        content: Text(section.name, style: AppText.adminTable),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
+            child: Text(l10n.commonDelete),
+          ),
+        ],
+      ),
+    );
+
+    if (!(confirmed ?? false) || !context.mounted) return;
+
+    // The server detaches the section's products rather than deleting them.
+    final result = await ref.read(adminRepositoryProvider).deleteSection(section.id);
+    if (!context.mounted) return;
+
+    switch (result) {
+      case Ok():
+        ref
+          ..invalidate(adminSectionsProvider(vendorId))
+          ..invalidate(adminProductsProvider);
+      case Err(:final failure):
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.failureMessage(failure))),
+        );
+    }
   }
 }
 

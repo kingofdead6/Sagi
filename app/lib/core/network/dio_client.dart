@@ -33,11 +33,14 @@ class ApiClient {
     }
   }
 
+  // The hosted API runs on a free tier that suspends when idle, so the first
+  // request after a quiet spell pays a cold start of roughly half a minute.
+  // These timeouts are sized to survive that rather than to fail fast.
   static BaseOptions get _baseOptions => BaseOptions(
         baseUrl: Api.baseUrl,
-        connectTimeout: const Duration(seconds: 12),
-        receiveTimeout: const Duration(seconds: 20),
-        sendTimeout: const Duration(seconds: 20),
+        connectTimeout: const Duration(seconds: 45),
+        receiveTimeout: const Duration(seconds: 45),
+        sendTimeout: const Duration(seconds: 45),
         contentType: 'application/json',
         headers: {'Accept': 'application/json'},
       );

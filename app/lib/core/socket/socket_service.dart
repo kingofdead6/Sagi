@@ -55,7 +55,9 @@ class SocketService {
     final socket = io.io(
       Api.socketUrl,
       io.OptionBuilder()
-          .setTransports(['websocket'])
+          // Websocket first, but keep long-polling as a fallback: some mobile
+          // carriers and corporate proxies block the upgrade handshake.
+          .setTransports(['websocket', 'polling'])
           .setAuth({'token': accessToken})
           .enableReconnection()
           .setReconnectionDelay(1000)

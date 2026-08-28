@@ -1,18 +1,24 @@
 import 'package:flutter/foundation.dart';
 
-/// Every server path in one place. The base URL is configured at build time:
+/// Every server path in one place.
+///
+/// The base URL defaults to the hosted API so a fresh `flutter run` talks to a
+/// real backend with no extra flags. Point it somewhere else at build time:
 /// `flutter run --dart-define=SAJI_API_URL=http://10.0.2.2:4000`
 abstract final class Api {
   static const _configured = String.fromEnvironment('SAJI_API_URL');
 
-  /// Falls back to a sensible local default per platform: `localhost` for the
-  /// admin dashboard in a browser, and the Android emulator's host alias for
-  /// the mobile surfaces.
-  static final baseUrl = _configured.isNotEmpty
-      ? _configured
-      : kIsWeb
-          ? 'http://localhost:4000'
-          : 'http://10.0.2.2:4000';
+  /// The deployed API. Free Render instances sleep when idle, so the first
+  /// request after a quiet spell can take ~30s — hence the generous timeouts
+  /// in `ApiClient`.
+  static const hostedUrl = 'https://sagi-h2du.onrender.com';
+
+  /// Local development targets, kept here so switching is a one-line change:
+  /// `localhost` for the admin dashboard in a browser, and the Android
+  /// emulator's host alias for the mobile surfaces.
+  static String get localUrl => kIsWeb ? 'http://localhost:4000' : 'http://10.0.2.2:4000';
+
+  static final baseUrl = _configured.isNotEmpty ? _configured : hostedUrl;
 
   static const prefix = '/api/v1';
   static String get socketUrl => baseUrl;

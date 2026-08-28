@@ -2421,6 +2421,30 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'{amount} د.ج'**
   String amountWithCurrency(String amount);
+
+  /// No description provided for @adminImagePick.
+  ///
+  /// In ar, this message translates to:
+  /// **'اضغط لاختيار صورة'**
+  String get adminImagePick;
+
+  /// No description provided for @adminImageRemove.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف الصورة'**
+  String get adminImageRemove;
+
+  /// No description provided for @adminProductImage.
+  ///
+  /// In ar, this message translates to:
+  /// **'صورة المنتج'**
+  String get adminProductImage;
+
+  /// No description provided for @adminOfferImage.
+  ///
+  /// In ar, this message translates to:
+  /// **'صورة العرض'**
+  String get adminOfferImage;
 }
 
 class _AppLocalizationsDelegate

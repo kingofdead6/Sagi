@@ -18,6 +18,8 @@ dependencies:
 
   # networking & realtime
   dio: ^5.7.0
+  # Direct dependency because the upload service builds MediaType itself.
+  http_parser: ^4.1.0
   pretty_dio_logger: ^1.4.0
   socket_io_client: ^2.0.3+1
 

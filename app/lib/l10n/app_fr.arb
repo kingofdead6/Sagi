@@ -498,5 +498,9 @@
         "type": "String"
       }
     }
-  }
+  },
+  "adminImagePick": "Choisir une image",
+  "adminImageRemove": "Supprimer l'image",
+  "adminProductImage": "Image du produit",
+  "adminOfferImage": "Image de l'offre"
 }

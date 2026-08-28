@@ -6,13 +6,16 @@ import 'package:saji/app/theme/tokens.dart';
 import 'package:saji/core/failures.dart';
 import 'package:saji/core/l10n_ext.dart';
 import 'package:saji/core/models/page.dart';
+import 'package:saji/core/models/image_ref.dart';
 import 'package:saji/core/money.dart';
+import 'package:saji/core/network/image_upload_service.dart';
 import 'package:saji/core/result.dart';
 import 'package:saji/core/widgets/empty_state.dart';
 import 'package:saji/core/widgets/error_retry.dart';
 import 'package:saji/core/widgets/price_text.dart';
 import 'package:saji/features/admin/domain/admin_models.dart';
 import 'package:saji/features/admin/presentation/admin_controller.dart';
+import 'package:saji/features/admin/presentation/admin_image_field.dart';
 import 'package:saji/features/admin/presentation/admin_widgets.dart';
 import 'package:saji/features/admin/presentation/pages/admin_vendor_form.dart';
 import 'package:saji/features/catalog/domain/product.dart';
@@ -561,6 +564,7 @@ class _ProductDialogState extends ConsumerState<_ProductDialog> {
   );
   late String? _vendorId = widget.product?.vendor ?? widget.vendorId;
   late bool _available = widget.product?.isAvailable ?? true;
+  late ImageRef? _image = widget.product?.image;
   bool _saving = false;
 
   @override
@@ -589,6 +593,7 @@ class _ProductDialogState extends ConsumerState<_ProductDialog> {
         if (_description.text.trim().isNotEmpty) 'description': _description.text.trim(),
         // The form takes dinars; the wire always carries centimes.
         'priceCentimes': Money.fromDinars(dinars).centimes,
+        'image': _image?.toJson(),
         'isAvailable': _available,
       },
       id: widget.product?.id,
@@ -647,6 +652,13 @@ class _ProductDialogState extends ConsumerState<_ProductDialog> {
                 label: l10n.adminProductPrice,
                 controller: _price,
                 keyboardType: TextInputType.number,
+              ),
+              AdminImageField(
+                label: l10n.adminProductImage,
+                value: _image,
+                folder: UploadFolder.products,
+                fallbackIcon: Icons.fastfood_rounded,
+                onChanged: (image) => setState(() => _image = image),
               ),
               AdminSwitchField(
                 label: l10n.adminProductAvailable,
@@ -791,6 +803,7 @@ class _OfferDialogState extends ConsumerState<_OfferDialog> {
   late String? _vendorId = widget.offer?.vendor;
   late bool _showOnHome = widget.offer?.showOnHome ?? false;
   late bool _isActive = widget.offer?.isActive ?? true;
+  late ImageRef? _image = widget.offer?.image;
   bool _saving = false;
 
   @override
@@ -813,6 +826,7 @@ class _OfferDialogState extends ConsumerState<_OfferDialog> {
         // A fixed offer is entered in dinars but stored in centimes.
         'value': _type == OfferType.fixed ? Money.fromDinars(rawValue).centimes : rawValue,
         'vendor': _vendorId,
+        'image': _image?.toJson(),
         'showOnHome': _showOnHome,
         'isActive': _isActive,
       },
@@ -848,6 +862,13 @@ class _OfferDialogState extends ConsumerState<_OfferDialog> {
             children: [
               AdminField(label: l10n.adminOfferTitle, controller: _title),
               AdminField(label: l10n.adminOfferSubtitle, controller: _subtitle),
+              AdminImageField(
+                label: l10n.adminOfferImage,
+                value: _image,
+                folder: UploadFolder.offers,
+                fallbackIcon: Icons.local_offer_rounded,
+                onChanged: (image) => setState(() => _image = image),
+              ),
               Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.md),
                 child: DropdownButtonFormField<OfferType>(

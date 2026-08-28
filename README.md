@@ -216,3 +216,13 @@ docker run --env-file server/.env -p 4000:4000 saji-api
 
 See `DECISIONS.md` for every judgement call made while building this, and
 `PROGRESS.md` for the milestone checklist and what is verified.
+
+
+
+
+npm run seed — password for everyone is saji1234.
+
+Role	Phone
+admin	0555000001
+agents	0661000001, 0661000002
+customers	0770000001, 0770000002, 0770000003

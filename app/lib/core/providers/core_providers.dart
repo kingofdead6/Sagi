@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:saji/core/location/location_service.dart';
 import 'package:saji/core/map/map_service.dart';
 import 'package:saji/core/network/dio_client.dart';
+import 'package:saji/core/network/image_upload_service.dart';
 import 'package:saji/core/notifications/notification_service.dart';
 import 'package:saji/core/socket/socket_service.dart';
 import 'package:saji/core/storage/local_cache.dart';
@@ -49,3 +50,9 @@ final apiClientProvider = Provider<ApiClient>((ref) {
     onSessionExpired: expired.call,
   );
 });
+
+/// Image picking + upload, sharing the authenticated client so the bearer token
+/// and refresh-on-401 behaviour apply to uploads too.
+final imageUploadServiceProvider = Provider<ImageUploadService>(
+  (ref) => ImageUploadService(ref.watch(apiClientProvider)),
+);

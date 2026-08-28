@@ -7,9 +7,12 @@ import 'package:saji/app/theme/tokens.dart';
 import 'package:saji/core/l10n_ext.dart';
 import 'package:saji/core/location/location_service.dart';
 import 'package:saji/core/map/map_view.dart';
+import 'package:saji/core/models/image_ref.dart';
 import 'package:saji/core/money.dart';
+import 'package:saji/core/network/image_upload_service.dart';
 import 'package:saji/core/result.dart';
 import 'package:saji/features/admin/presentation/admin_controller.dart';
+import 'package:saji/features/admin/presentation/admin_image_field.dart';
 import 'package:saji/features/admin/presentation/admin_widgets.dart';
 import 'package:saji/features/admin/presentation/pages/admin_catalog_pages.dart';
 import 'package:saji/features/vendors/domain/vendor.dart';
@@ -37,6 +40,8 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
   final _prepMax = TextEditingController(text: '30');
 
   String? _categoryId;
+  ImageRef? _logo;
+  ImageRef? _cover;
   LatLng _location = LocationService.fallbackCenter;
   bool _isOpen = true;
   bool _isFeatured = false;
@@ -74,6 +79,8 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
     _prepMin.text = '${vendor.prepTimeMin}';
     _prepMax.text = '${vendor.prepTimeMax}';
     _categoryId = vendor.category;
+    _logo = vendor.logo;
+    _cover = vendor.cover;
     _location = vendor.location ?? LocationService.fallbackCenter;
     _isOpen = vendor.isOpen;
     _isFeatured = vendor.isFeatured;
@@ -107,6 +114,8 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
         'minOrderCentimes': Money.fromDinars(num.tryParse(_minOrder.text.trim()) ?? 0).centimes,
         'prepTimeMin': int.tryParse(_prepMin.text.trim()) ?? 15,
         'prepTimeMax': int.tryParse(_prepMax.text.trim()) ?? 30,
+        'logo': _logo?.toJson(),
+        'cover': _cover?.toJson(),
         'isOpen': _isOpen,
         'isFeatured': _isFeatured,
       },
@@ -178,6 +187,20 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
               label: l10n.adminVendorDescription,
               controller: _description,
               maxLines: 2,
+            ),
+            AdminImageField(
+              label: l10n.adminVendorLogo,
+              value: _logo,
+              folder: UploadFolder.vendors,
+              height: 120,
+              fallbackIcon: Icons.storefront_rounded,
+              onChanged: (image) => setState(() => _logo = image),
+            ),
+            AdminImageField(
+              label: l10n.adminVendorCover,
+              value: _cover,
+              folder: UploadFolder.vendors,
+              onChanged: (image) => setState(() => _cover = image),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.md),

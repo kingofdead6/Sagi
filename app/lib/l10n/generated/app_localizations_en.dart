@@ -1204,4 +1204,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String amountWithCurrency(String amount) {
     return '$amount د.ج';
   }
+
+  @override
+  String get adminImagePick => 'Tap to choose an image';
+
+  @override
+  String get adminImageRemove => 'Remove image';
+
+  @override
+  String get adminProductImage => 'Product image';
+
+  @override
+  String get adminOfferImage => 'Offer image';
 }

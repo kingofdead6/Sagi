@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:saji/app/router.dart';
 import 'package:saji/app/theme/app_theme.dart';
+import 'package:saji/core/money.dart';
 import 'package:saji/features/auth/domain/user.dart';
 import 'package:saji/features/auth/presentation/auth_controller.dart';
 import 'package:saji/features/profile/presentation/settings_controller.dart';
@@ -20,7 +21,7 @@ class SajiApp extends ConsumerWidget {
     final isAdmin = ref.watch(authControllerProvider).role == UserRole.admin;
 
     return MaterialApp.router(
-      title: 'ساجي',
+      onGenerateTitle: (context) => AppLocalizations.of(context).appName,
       debugShowCheckedModeBanner: false,
       routerConfig: router,
       theme: isAdmin ? AppTheme.admin : AppTheme.customer,
@@ -37,6 +38,10 @@ class SajiApp extends ConsumerWidget {
       ],
 
       builder: (context, child) {
+        // Money has no BuildContext of its own, so the currency suffix is
+        // refreshed here whenever the locale changes.
+        Money.symbol = AppLocalizations.of(context).currencySymbol;
+
         // Cap text scaling so the dense Figma layouts stay readable.
         final scale = MediaQuery.textScalerOf(context).clamp(
           minScaleFactor: 0.9,

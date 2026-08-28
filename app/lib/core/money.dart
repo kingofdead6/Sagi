@@ -19,7 +19,11 @@ class Money implements Comparable<Money> {
   }
 
   static const centimesPerDinar = 100;
-  static const symbol = 'د.ج';
+
+  /// The currency suffix, in the active language. [Money] is a domain object
+  /// with no BuildContext, so the app sets this once when the locale changes
+  /// rather than threading l10n through every price.
+  static String symbol = 'د.ج';
 
   final int centimes;
 

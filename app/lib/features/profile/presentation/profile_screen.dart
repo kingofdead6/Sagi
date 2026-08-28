@@ -8,6 +8,7 @@ import 'package:saji/app/theme/tokens.dart';
 import 'package:saji/core/l10n_ext.dart';
 import 'package:saji/core/phone.dart';
 import 'package:saji/features/auth/presentation/auth_controller.dart';
+import 'package:saji/features/profile/presentation/settings_controller.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Figma node 2601:1029 — phone header, settings groups, follow-us, join-us,
@@ -115,6 +116,19 @@ class ProfileScreen extends ConsumerWidget {
                 onTap: () => context.push(Routes.notifications),
               ),
               _Tile(
+                icon: Icons.language_rounded,
+                label: l10n.profileLanguage,
+                // Watch the locale itself, so the label refreshes the moment
+                // the language changes.
+                trailing: Text(
+                  AppLanguage.fromCode(
+                    ref.watch(localeControllerProvider).languageCode,
+                  ).label,
+                  style: AppText.meta,
+                ),
+                onTap: () => _pickLanguage(context, ref),
+              ),
+              _Tile(
                 icon: Icons.headset_mic_outlined,
                 label: l10n.profileSupport,
                 onTap: () => launchUrl(Phone.dialUri('+213770000000')),
@@ -218,6 +232,63 @@ class _Group extends StatelessWidget {
   }
 }
 
+/// The language sheet. Every label is written in its own language, so it stays
+/// readable whichever locale the app is currently in.
+Future<void> _pickLanguage(BuildContext context, WidgetRef ref) async {
+  final l10n = context.l10n;
+  final controller = ref.read(localeControllerProvider.notifier);
+  final current = controller.language;
+
+  await showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: AppColors.surface,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.sheet)),
+    ),
+    builder: (sheetContext) => SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.xl,
+              AppSpacing.xl,
+              AppSpacing.xl,
+              AppSpacing.xs,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.profileLanguage, style: AppText.cardTitle),
+                Gap.xs,
+                Text(l10n.languageHint, style: AppText.meta),
+              ],
+            ),
+          ),
+          for (final language in AppLanguage.values)
+            ListTile(
+              title: Text(
+                language.label,
+                style: AppText.body.copyWith(
+                  fontWeight:
+                      language == current ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+              trailing: language == current
+                  ? const Icon(Icons.check_rounded, color: AppColors.primaryGreen)
+                  : null,
+              onTap: () {
+                controller.select(language);
+                Navigator.of(sheetContext).pop();
+              },
+            ),
+          Gap.md,
+        ],
+      ),
+    ),
+  );
+}
+
 class _Tile extends StatelessWidget {
   const _Tile({
     required this.icon,
@@ -244,7 +315,14 @@ class _Tile extends StatelessWidget {
       trailing: trailing ??
           (onTap == null
               ? null
-              : const Icon(Icons.chevron_left_rounded, color: AppColors.textMuted)),
+              // The chevron points toward the trailing edge, which flips with
+              // the locale: left in Arabic, right in English and French.
+              : Icon(
+                  Directionality.of(context) == TextDirection.rtl
+                      ? Icons.chevron_left_rounded
+                      : Icons.chevron_right_rounded,
+                  color: AppColors.textMuted,
+                )),
     );
   }
 }

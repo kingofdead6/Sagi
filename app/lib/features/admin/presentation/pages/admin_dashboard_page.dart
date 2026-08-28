@@ -23,9 +23,12 @@ class AdminDashboardPage extends ConsumerWidget {
     return Row(
       children: [
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+          // The page scrolls as a whole: the stat grid scrolls away with the
+          // orders table rather than staying pinned above its own scroller.
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
               Padding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: LayoutBuilder(
@@ -103,9 +106,10 @@ class AdminDashboardPage extends ConsumerWidget {
                   ],
                 ),
               ),
-              Gap.md,
-              const Expanded(child: AdminOrdersBoard()),
-            ],
+                Gap.md,
+                const AdminOrdersBoard(shrinkWrap: true),
+              ],
+            ),
           ),
         ),
         if (selectedId != null) const AdminOrderDrawer(),

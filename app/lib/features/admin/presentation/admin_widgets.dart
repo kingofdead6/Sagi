@@ -114,6 +114,7 @@ class AdminDataTable<T> extends StatefulWidget {
     this.onRowTap,
     this.rowColor,
     this.emptyState,
+    this.shrinkWrap = false,
   });
 
   final List<AdminColumn<T>> columns;
@@ -121,6 +122,10 @@ class AdminDataTable<T> extends StatefulWidget {
   final void Function(T row)? onRowTap;
   final Color? Function(T row)? rowColor;
   final Widget? emptyState;
+
+  /// Lay the rows out at their natural height instead of filling the parent,
+  /// so the table can sit inside a page that scrolls as a whole.
+  final bool shrinkWrap;
 
   @override
   State<AdminDataTable<T>> createState() => _AdminDataTableState<T>();
@@ -140,7 +145,13 @@ class _AdminDataTableState<T> extends State<AdminDataTable<T>> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.rows.isEmpty && widget.emptyState != null) return widget.emptyState!;
+    if (widget.rows.isEmpty && widget.emptyState != null) {
+      // The empty state has no intrinsic height, so give it one when the page
+      // around the table is what scrolls.
+      return widget.shrinkWrap
+          ? SizedBox(height: 280, child: widget.emptyState)
+          : widget.emptyState!;
+    }
 
     final floor = widget.columns.fold<double>(0, (sum, c) => sum + c._floor) + _rowPadding;
 
@@ -155,6 +166,7 @@ class _AdminDataTableState<T> extends State<AdminDataTable<T>> {
           width: tableWidth,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: widget.shrinkWrap ? MainAxisSize.min : MainAxisSize.max,
             children: [
               Container(
                 decoration: const BoxDecoration(
@@ -178,21 +190,34 @@ class _AdminDataTableState<T> extends State<AdminDataTable<T>> {
                   ],
                 ),
               ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: widget.rows.length,
-                  itemBuilder: (context, index) {
-                    final row = widget.rows[index];
-                    return _TableRow<T>(
-                      row: row,
-                      columns: widget.columns,
-                      onTap: widget.onRowTap,
-                      tint: widget.rowColor?.call(row),
-                      pinned: needsScroll,
-                    );
-                  },
+              // Shrink-wrapped, the rows size to their content and the page
+              // around them does the scrolling; otherwise the table fills its
+              // parent and scrolls its own body.
+              if (widget.shrinkWrap)
+                for (final row in widget.rows)
+                  _TableRow<T>(
+                    row: row,
+                    columns: widget.columns,
+                    onTap: widget.onRowTap,
+                    tint: widget.rowColor?.call(row),
+                    pinned: needsScroll,
+                  )
+              else
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: widget.rows.length,
+                    itemBuilder: (context, index) {
+                      final row = widget.rows[index];
+                      return _TableRow<T>(
+                        row: row,
+                        columns: widget.columns,
+                        onTap: widget.onRowTap,
+                        tint: widget.rowColor?.call(row),
+                        pinned: needsScroll,
+                      );
+                    },
+                  ),
                 ),
-              ),
             ],
           ),
         );

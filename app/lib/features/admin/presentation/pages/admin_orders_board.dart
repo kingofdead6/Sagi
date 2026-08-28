@@ -19,26 +19,37 @@ import 'package:saji/features/orders/domain/order_status.dart';
 /// The live orders table. Rows carry their status colour and a `Late Delivery`
 /// chip once the order passes the configured threshold.
 class AdminOrdersBoard extends ConsumerWidget {
-  const AdminOrdersBoard({super.key, this.limit});
+  const AdminOrdersBoard({super.key, this.limit, this.shrinkWrap = false});
 
   final int? limit;
+
+  /// Let the table size to its rows, for a page that scrolls as a whole.
+  final bool shrinkWrap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final orders = ref.watch(adminOrdersProvider);
 
+    // Inside a scrolling page these states have no height of their own, so
+    // they get a sensible one rather than collapsing or overflowing.
+    Widget sized(Widget child) =>
+        shrinkWrap ? SizedBox(height: 280, child: child) : child;
+
     return orders.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, _) => ErrorRetry(
-        failure: error is Failure ? error : const Failure.unknown(),
-        onRetry: () => ref.invalidate(adminOrdersProvider),
+      loading: () => sized(const Center(child: CircularProgressIndicator())),
+      error: (error, _) => sized(
+        ErrorRetry(
+          failure: error is Failure ? error : const Failure.unknown(),
+          onRetry: () => ref.invalidate(adminOrdersProvider),
+        ),
       ),
       data: (page) {
         final rows = limit == null ? page.items : page.items.take(limit!).toList();
 
         return AdminDataTable<AppOrder>(
           rows: rows,
+          shrinkWrap: shrinkWrap,
           onRowTap: (order) =>
               ref.read(selectedOrderIdProvider.notifier).state = order.id,
           rowColor: (order) => order.isLate

@@ -442,8 +442,9 @@ export async function listOrders(filters: OrderListFilters): Promise<Page<unknow
 
   const [docs, total] = await Promise.all([
     Order.find(query)
-      // VIP first, newest first — matching the admin board ordering.
-      .sort({ deliveryType: -1, createdAt: -1 })
+      // Strictly newest first: a fresh order always outranks an older one, VIP
+      // or not. VIP is surfaced by its badge, never by jumping the queue.
+      .sort({ createdAt: -1, _id: -1 })
       .skip(skipFor(page, limit))
       .limit(limit)
       .populate(ORDER_POPULATE),

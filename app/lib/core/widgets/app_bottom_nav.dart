@@ -12,8 +12,8 @@ class BottomNavItem {
   final String label;
 }
 
-/// The blurred bottom bar with a 32px top radius; the active item sits in a
-/// green pill carrying its own shadow.
+/// A floating, blurred pill bar; the active item sits in its own green pill
+/// carrying a coloured shadow.
 class AppBottomNav extends StatelessWidget {
   const AppBottomNav({
     required this.items,
@@ -30,21 +30,28 @@ class AppBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.card)),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: AppSizes.barBlur, sigmaY: AppSizes.barBlur),
-        child: Container(
-          decoration: const BoxDecoration(
-            color: AppColors.barTint,
-            boxShadow: AppShadows.bottomBar,
-          ),
-          child: SafeArea(
-            top: false,
-            child: Padding(
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          0,
+          AppSpacing.lg,
+          AppSpacing.md,
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(AppRadius.stadium),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: AppSizes.barBlur, sigmaY: AppSizes.barBlur),
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.barTint,
+                borderRadius: BorderRadius.circular(AppRadius.stadium),
+                boxShadow: AppShadows.bottomBar,
+              ),
               padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.lg,
-                vertical: AppSpacing.md,
+                horizontal: AppSpacing.sm,
+                vertical: AppSpacing.sm,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -87,7 +94,7 @@ class _NavEntry extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.stadium),
         child: AnimatedContainer(
           duration: AppDurations.fast,
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm, horizontal: AppSpacing.md),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm, horizontal: AppSpacing.xs),
           decoration: BoxDecoration(
             color: isActive ? AppColors.primaryGreen : Colors.transparent,
             borderRadius: BorderRadius.circular(AppRadius.stadium),
@@ -126,12 +133,15 @@ class _NavEntry extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 2),
-              Text(
-                item.label,
-                maxLines: 1,
-                overflow: TextOverflow.clip,
-                style: AppText.navLabel.copyWith(
-                  color: isActive ? Colors.white : AppColors.textSecondary,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  item.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.clip,
+                  style: AppText.navLabel.copyWith(
+                    color: isActive ? Colors.white : AppColors.textSecondary,
+                  ),
                 ),
               ),
             ],

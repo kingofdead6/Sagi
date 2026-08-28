@@ -2,75 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:saji/app/theme/spacing.dart';
 import 'package:saji/app/theme/text_styles.dart';
 import 'package:saji/app/theme/tokens.dart';
+import 'package:saji/core/widgets/app_image.dart';
 import 'package:saji/features/offers/domain/offer.dart';
 
-/// The deep-green promo banner from the home screen, as a swipeable carousel
-/// when more than one offer is flagged `showOnHome`.
-class PromoBannerCarousel extends StatefulWidget {
+/// The offers strip below the categories: wide artwork cards that scroll
+/// sideways, peeking at the next one so the row reads as scrollable.
+class PromoBannerCarousel extends StatelessWidget {
   const PromoBannerCarousel({required this.offers, super.key, this.onTap});
 
   final List<Offer> offers;
   final void Function(Offer offer)? onTap;
 
   @override
-  State<PromoBannerCarousel> createState() => _PromoBannerCarouselState();
-}
-
-class _PromoBannerCarouselState extends State<PromoBannerCarousel> {
-  late final PageController _controller = PageController(viewportFraction: 0.92);
-  int _index = 0;
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          height: 148,
-          child: PageView.builder(
-            controller: _controller,
-            itemCount: widget.offers.length,
-            onPageChanged: (index) => setState(() => _index = index),
-            itemBuilder: (context, index) {
-              final offer = widget.offers[index];
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-                child: _PromoBanner(offer: offer, onTap: () => widget.onTap?.call(offer)),
-              );
-            },
-          ),
-        ),
-        if (widget.offers.length > 1) ...[
-          Gap.md,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              for (var i = 0; i < widget.offers.length; i++)
-                AnimatedContainer(
-                  duration: AppDurations.fast,
-                  margin: const EdgeInsets.symmetric(horizontal: 3),
-                  width: i == _index ? 18 : 6,
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: i == _index ? AppColors.primaryGreen : AppColors.dotDivider,
-                    borderRadius: BorderRadius.circular(AppRadius.stadium),
-                  ),
-                ),
-            ],
-          ),
-        ],
-      ],
+    final cardWidth = MediaQuery.sizeOf(context).width * 0.74;
+
+    return SizedBox(
+      height: AppSizes.offerStrip,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenH),
+        itemCount: offers.length,
+        separatorBuilder: (_, __) => Gap.wMd,
+        itemBuilder: (context, index) {
+          final offer = offers[index];
+          return SizedBox(
+            width: cardWidth,
+            child: PromoBanner(offer: offer, onTap: () => onTap?.call(offer)),
+          );
+        },
+      ),
     );
   }
 }
 
-class _PromoBanner extends StatelessWidget {
-  const _PromoBanner({required this.offer, this.onTap});
+/// One offer card. Artwork when the offer has an image, otherwise the brand
+/// gradient with the offer type's icon.
+class PromoBanner extends StatelessWidget {
+  const PromoBanner({required this.offer, super.key, this.onTap});
 
   final Offer offer;
   final VoidCallback? onTap;
@@ -79,14 +48,65 @@ class _PromoBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: AppRadius.cardBorder,
+      borderRadius: AppRadius.mediumBorder,
       child: Container(
         decoration: const BoxDecoration(
-          color: AppColors.primaryGreenDeep,
-          borderRadius: AppRadius.cardBorder,
-          boxShadow: AppShadows.promo,
+          borderRadius: AppRadius.mediumBorder,
+          boxShadow: AppShadows.card,
         ),
-        padding: const EdgeInsets.all(AppSpacing.xl),
+        clipBehavior: Clip.antiAlias,
+        child: offer.image != null ? _artwork() : _gradient(),
+      ),
+    );
+  }
+
+  Widget _artwork() {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        AppImage(image: offer.image, fit: BoxFit.cover),
+        const DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+              colors: [Color(0xB3000000), Colors.transparent],
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                offer.title,
+                style: AppText.cardTitle.copyWith(color: Colors.white),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              if (offer.vendorName != null) ...[
+                Gap.xs,
+                Text(
+                  offer.vendorName!,
+                  style: AppText.meta.copyWith(color: Colors.white70),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _gradient() {
+    return DecoratedBox(
+      decoration: const BoxDecoration(gradient: AppColors.promoGradient),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Row(
           children: [
             Expanded(
@@ -117,24 +137,26 @@ class _PromoBanner extends StatelessWidget {
                         vertical: AppSpacing.xs,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.18),
+                        color: Colors.white.withValues(alpha: 0.22),
                         borderRadius: BorderRadius.circular(AppRadius.stadium),
                       ),
                       child: Text(
                         offer.vendorName!,
                         style: AppText.badge.copyWith(color: Colors.white),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ],
               ),
             ),
-            Gap.wLg,
+            Gap.wMd,
             Container(
-              width: 72,
-              height: 72,
+              width: 64,
+              height: 64,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.15),
+                color: Colors.white.withValues(alpha: 0.18),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -145,7 +167,7 @@ class _PromoBanner extends StatelessWidget {
                   OfferType.bundle => Icons.inventory_2_rounded,
                 },
                 color: Colors.white,
-                size: 34,
+                size: 30,
               ),
             ),
           ],

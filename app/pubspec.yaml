@@ -73,3 +73,5 @@ flutter:
   generate: true
   assets:
     - assets/images/
+    - assets/Home/
+    - assets/Logo.jpg

@@ -68,7 +68,7 @@ class VendorCard extends StatelessWidget {
                       start: AppSpacing.md,
                       child: _Chip(
                         icon: Icons.star_rounded,
-                        iconColor: AppColors.warning,
+                        iconColor: AppColors.highlight,
                         label: vendor.rating.toStringAsFixed(1),
                       ),
                     ),
@@ -82,8 +82,9 @@ class VendorCard extends StatelessWidget {
                           vertical: AppSpacing.xs,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.primaryGreen,
+                          gradient: AppColors.accentGradient,
                           borderRadius: BorderRadius.circular(AppRadius.stadium),
+                          boxShadow: AppShadows.accent,
                         ),
                         child: Text(
                           offerLabel ?? l10n.vendorSpecialOffers,

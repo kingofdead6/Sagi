@@ -99,7 +99,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       // ── customer ────────────────────────────────────────────────────────
       GoRoute(path: Routes.home, builder: (_, __) => const CustomerShell(tab: 0)),
       GoRoute(path: Routes.orders, builder: (_, __) => const CustomerShell(tab: 1)),
-      GoRoute(path: Routes.profile, builder: (_, __) => const CustomerShell(tab: 2)),
+      GoRoute(path: Routes.profile, builder: (_, __) => const CustomerShell(tab: 3)),
       GoRoute(path: Routes.vendors, builder: (_, state) {
         return VendorsScreen(
           categoryId: state.uri.queryParameters['category'],

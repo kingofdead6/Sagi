@@ -476,6 +476,8 @@
     }
   },
   "settingsServiceFee": "رسوم الخدمة",
+  "settingsMinVendorFee": "أدنى سعر توصيل للمتجر",
+  "settingsMaxVendorFee": "أقصى سعر توصيل للمتجر",
   "settingsVipSurcharge": "رسوم VIP الإضافية",
   "settingsAssignTimeout": "مهلة قبول الطلب (ثانية)",
   "settingsLateThreshold": "حد التأخير (دقيقة)",
@@ -572,6 +574,18 @@
   "portalUnsectioned": "بدون قسم",
   "portalUnavailable": "غير متوفر",
   "portalEmptyTitle": "القائمة فارغة",
+  "portalDelivery": "التوصيل",
+  "portalDeliveryFee": "سعر التوصيل",
+  "portalDeliveryFeeHint": "ما يدفعه الزبون مقابل التوصيل من متجرك",
+  "portalMinOrder": "الحد الأدنى للطلب",
+  "portalPrepTime": "مدة التحضير (دقيقة)",
+  "portalPrepTimeTo": "إلى",
+  "portalEditDelivery": "تعديل إعدادات التوصيل",
+  "portalFeeRange": "المجال المسموح: {min} – {max}",
+  "@portalFeeRange": {
+    "placeholders": { "min": {"type": "String"}, "max": {"type": "String"} }
+  },
+  "portalSaved": "تم الحفظ",
   "portalEmptyMessage": "أضف أقسامك ومنتجاتك ليراها الزبائن",
   "adminVendorAccount": "حساب المتجر",
   "adminVendorAccountCreate": "إنشاء حساب دخول",

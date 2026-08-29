@@ -476,6 +476,8 @@
     }
   },
   "settingsServiceFee": "Frais de service",
+  "settingsMinVendorFee": "Frais de livraison minimum du magasin",
+  "settingsMaxVendorFee": "Frais de livraison maximum du magasin",
   "settingsVipSurcharge": "Supplément VIP",
   "settingsAssignTimeout": "Délai d'acceptation (secondes)",
   "settingsLateThreshold": "Seuil de retard (minutes)",
@@ -572,6 +574,18 @@
   "portalUnsectioned": "Sans section",
   "portalUnavailable": "Indisponible",
   "portalEmptyTitle": "Votre menu est vide",
+  "portalDelivery": "Livraison",
+  "portalDeliveryFee": "Frais de livraison",
+  "portalDeliveryFeeHint": "Ce que le client paie pour la livraison depuis votre magasin",
+  "portalMinOrder": "Commande minimum",
+  "portalPrepTime": "Temps de préparation (min)",
+  "portalPrepTimeTo": "à",
+  "portalEditDelivery": "Modifier les paramètres de livraison",
+  "portalFeeRange": "Plage autorisée : {min} – {max}",
+  "@portalFeeRange": {
+    "placeholders": { "min": {"type": "String"}, "max": {"type": "String"} }
+  },
+  "portalSaved": "Enregistré",
   "portalEmptyMessage": "Ajoutez vos sections et produits pour que les clients les voient",
   "adminVendorAccount": "Compte du magasin",
   "adminVendorAccountCreate": "Créer un accès",

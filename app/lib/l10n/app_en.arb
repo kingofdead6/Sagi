@@ -476,6 +476,8 @@
     }
   },
   "settingsServiceFee": "Service fee",
+  "settingsMinVendorFee": "Minimum store delivery fee",
+  "settingsMaxVendorFee": "Maximum store delivery fee",
   "settingsVipSurcharge": "VIP surcharge",
   "settingsAssignTimeout": "Order acceptance timeout (seconds)",
   "settingsLateThreshold": "Late threshold (minutes)",
@@ -572,6 +574,18 @@
   "portalUnsectioned": "No section",
   "portalUnavailable": "Unavailable",
   "portalEmptyTitle": "Your menu is empty",
+  "portalDelivery": "Delivery",
+  "portalDeliveryFee": "Delivery fee",
+  "portalDeliveryFeeHint": "What customers pay for delivery from your store",
+  "portalMinOrder": "Minimum order",
+  "portalPrepTime": "Preparation time (min)",
+  "portalPrepTimeTo": "to",
+  "portalEditDelivery": "Edit delivery settings",
+  "portalFeeRange": "Allowed range: {min} – {max}",
+  "@portalFeeRange": {
+    "placeholders": { "min": {"type": "String"}, "max": {"type": "String"} }
+  },
+  "portalSaved": "Saved",
   "portalEmptyMessage": "Add sections and products so customers can see them",
   "adminVendorAccount": "Store account",
   "adminVendorAccountCreate": "Create a login",

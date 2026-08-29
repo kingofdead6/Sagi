@@ -8,6 +8,7 @@ import 'package:saji/core/l10n_ext.dart';
 import 'package:saji/core/money.dart';
 import 'package:saji/core/phone.dart';
 import 'package:saji/core/result.dart';
+import 'package:saji/core/widgets/text_input_dialog.dart';
 import 'package:saji/core/widgets/error_retry.dart';
 import 'package:saji/core/widgets/price_text.dart';
 import 'package:saji/core/widgets/status_chip.dart';
@@ -287,27 +288,14 @@ class _OrderActionsState extends ConsumerState<_OrderActions> {
 
   Future<void> _cancel() async {
     final l10n = context.l10n;
-    final controller = TextEditingController();
-
-    final reason = await showDialog<String>(
+    final reason = await showSingleTextInputDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.adminCancelReason, style: AppText.adminSubheading),
-        content: TextField(controller: controller, autofocus: true),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.commonCancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(controller.text.trim()),
-            style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
-            child: Text(l10n.commonConfirm),
-          ),
-        ],
-      ),
+      title: l10n.adminCancelReason,
+      titleStyle: AppText.adminSubheading,
+      label: l10n.adminCancelReason,
+      confirmLabel: l10n.commonConfirm,
+      danger: true,
     );
-    controller.dispose();
 
     if (reason != null && reason.length >= 3) {
       await _advance('cancelled', note: reason);

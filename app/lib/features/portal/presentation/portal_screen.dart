@@ -9,6 +9,7 @@ import 'package:saji/core/models/image_ref.dart';
 import 'package:saji/core/money.dart';
 import 'package:saji/core/network/image_upload_service.dart';
 import 'package:saji/core/result.dart';
+import 'package:saji/core/widgets/text_input_dialog.dart';
 import 'package:saji/core/widgets/app_image.dart';
 import 'package:saji/core/widgets/app_logo.dart';
 import 'package:saji/core/widgets/app_skeleton.dart';
@@ -20,11 +21,14 @@ import 'package:saji/features/catalog/domain/product.dart';
 import 'package:saji/features/portal/data/portal_repository.dart';
 import 'package:saji/features/vendors/domain/vendor.dart';
 
-/// The shop owner's whole app: their menu, grouped by section, plus the one
-/// switch that matters day to day — whether the shop is accepting orders.
+/// The shop owner's whole app: their menu, grouped by section, plus the two
+/// things that matter day to day — whether the shop is accepting orders, and
+/// what it charges to deliver.
 ///
-/// Deliberately narrow. Fees, delivery area and orders stay with the admin, so
-/// nothing here can put a shop into a state the dispatcher did not intend.
+/// The owner also sets their own delivery terms — the fee and the minimum
+/// order — within bounds the platform enforces. Delivery area and orders stay
+/// with the admin, so nothing here can put a shop into a state the dispatcher
+/// did not intend.
 class PortalScreen extends ConsumerWidget {
   const PortalScreen({super.key});
 
@@ -156,6 +160,8 @@ class _Menu extends ConsumerWidget {
           ),
           children: [
             _OpenSwitch(shop: shop),
+            Gap.md,
+            _DeliveryCard(shop: shop),
             Gap.lg,
             _SectionsBar(sections: sections),
             Gap.lg,
@@ -297,30 +303,12 @@ class _SectionsBar extends ConsumerWidget {
 
   Future<void> _addSection(BuildContext context, WidgetRef ref) async {
     final l10n = context.l10n;
-    final controller = TextEditingController();
-
-    final name = await showDialog<String>(
+    final name = await showSingleTextInputDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.portalAddSection, style: AppText.sectionTitle),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: InputDecoration(hintText: l10n.portalSectionName),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.commonCancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(controller.text.trim()),
-            child: Text(l10n.commonSave),
-          ),
-        ],
-      ),
+      title: l10n.portalAddSection,
+      titleStyle: AppText.sectionTitle,
+      label: l10n.portalSectionName,
     );
-    controller.dispose();
     if (name == null || name.isEmpty || !context.mounted) return;
 
     final result = await ref
@@ -602,6 +590,264 @@ class _ProductDialogState extends ConsumerState<_ProductDialog> {
         FilledButton(
           onPressed: _saving ? null : _save,
           child: Text(l10n.commonSave),
+        ),
+      ],
+    );
+  }
+}
+
+
+/// The shop's own delivery terms. Read-only at a glance; the numbers open an
+/// editor, because these are not values anyone should change by mistake.
+class _DeliveryCard extends ConsumerWidget {
+  const _DeliveryCard({required this.shop});
+
+  final Vendor shop;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: AppRadius.cardBorder,
+        border: Border.all(color: AppColors.dotDivider),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.delivery_dining_rounded, color: AppColors.primaryGreen),
+              Gap.wSm,
+              Expanded(child: Text(l10n.portalDelivery, style: AppText.sectionTitle)),
+              TextButton.icon(
+                onPressed: () => _edit(context, ref),
+                icon: const Icon(Icons.edit_rounded, size: 16),
+                label: Text(l10n.portalEditDelivery),
+              ),
+            ],
+          ),
+          Gap.sm,
+          Row(
+            children: [
+              Expanded(
+                child: _Stat(
+                  label: l10n.portalDeliveryFee,
+                  value: shop.deliveryFeeCentimes.format(),
+                ),
+              ),
+              Expanded(
+                child: _Stat(
+                  label: l10n.portalMinOrder,
+                  value: shop.minOrderCentimes.isZero
+                      ? '—'
+                      : shop.minOrderCentimes.format(),
+                ),
+              ),
+              Expanded(
+                child: _Stat(
+                  label: l10n.portalPrepTime,
+                  value: '${shop.prepTimeMin}–${shop.prepTimeMax}',
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _edit(BuildContext context, WidgetRef ref) async {
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (context) => _DeliveryDialog(shop: shop),
+    );
+    if (saved ?? false) ref.invalidate(portalVendorProvider);
+  }
+}
+
+class _Stat extends StatelessWidget {
+  const _Stat({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: AppText.meta.copyWith(color: AppColors.textMuted)),
+        Gap.xs,
+        Text(value, style: AppText.bodyStrong),
+      ],
+    );
+  }
+}
+
+/// Edits the delivery terms. Owns its controllers and disposes them with its
+/// own State, once the route is gone.
+class _DeliveryDialog extends ConsumerStatefulWidget {
+  const _DeliveryDialog({required this.shop});
+
+  final Vendor shop;
+
+  @override
+  ConsumerState<_DeliveryDialog> createState() => _DeliveryDialogState();
+}
+
+class _DeliveryDialogState extends ConsumerState<_DeliveryDialog> {
+  late final _fee = TextEditingController(
+    text: widget.shop.deliveryFeeCentimes.formatAmount(),
+  );
+  late final _minOrder = TextEditingController(
+    text: widget.shop.minOrderCentimes.formatAmount(),
+  );
+  late final _prepMin = TextEditingController(text: '${widget.shop.prepTimeMin}');
+  late final _prepMax = TextEditingController(text: '${widget.shop.prepTimeMax}');
+
+  String? _feeError;
+  bool _saving = false;
+
+  @override
+  void dispose() {
+    for (final controller in [_fee, _minOrder, _prepMin, _prepMax]) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  Future<void> _save(PortalLimits? limits) async {
+    final l10n = context.l10n;
+    final fee = num.tryParse(_fee.text.trim());
+    if (fee == null || fee < 0) {
+      setState(() => _feeError = l10n.adminInvalidNumber);
+      return;
+    }
+
+    final feeCentimes = Money.fromDinars(fee).centimes;
+    // Mirrors the server's bounds so a rejected value is named here rather
+    // than after a round trip.
+    if (limits != null &&
+        (feeCentimes < limits.minDeliveryFee.centimes ||
+            feeCentimes > limits.maxDeliveryFee.centimes)) {
+      setState(
+        () => _feeError = l10n.portalFeeRange(
+          limits.minDeliveryFee.format(),
+          limits.maxDeliveryFee.format(),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _feeError = null;
+      _saving = true;
+    });
+
+    final result = await ref.read(portalRepositoryProvider).updateShop({
+      'deliveryFeeCentimes': feeCentimes,
+      'minOrderCentimes':
+          Money.fromDinars(num.tryParse(_minOrder.text.trim()) ?? 0).centimes,
+      'prepTimeMin': int.tryParse(_prepMin.text.trim()) ?? widget.shop.prepTimeMin,
+      'prepTimeMax': int.tryParse(_prepMax.text.trim()) ?? widget.shop.prepTimeMax,
+    });
+    if (!mounted) return;
+    setState(() => _saving = false);
+
+    switch (result) {
+      case Ok():
+        Navigator.of(context).pop(true);
+      case Err(:final failure):
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.failureMessage(failure))),
+        );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final limits = ref.watch(portalLimitsProvider).valueOrNull;
+
+    return AlertDialog(
+      backgroundColor: AppColors.surface,
+      title: Text(l10n.portalEditDelivery, style: AppText.cardTitle),
+      content: SizedBox(
+        width: 360,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: _fee,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                style: AppText.body,
+                decoration: InputDecoration(
+                  labelText: l10n.portalDeliveryFee,
+                  helperText: limits == null
+                      ? l10n.portalDeliveryFeeHint
+                      : l10n.portalFeeRange(
+                          limits.minDeliveryFee.format(),
+                          limits.maxDeliveryFee.format(),
+                        ),
+                  helperMaxLines: 2,
+                  errorText: _feeError,
+                ),
+              ),
+              Gap.md,
+              TextField(
+                controller: _minOrder,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                style: AppText.body,
+                decoration: InputDecoration(labelText: l10n.portalMinOrder),
+              ),
+              Gap.md,
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _prepMin,
+                      keyboardType: TextInputType.number,
+                      style: AppText.body,
+                      decoration: InputDecoration(labelText: l10n.portalPrepTime),
+                    ),
+                  ),
+                  Gap.wSm,
+                  Text(l10n.portalPrepTimeTo, style: AppText.meta),
+                  Gap.wSm,
+                  Expanded(
+                    child: TextField(
+                      controller: _prepMax,
+                      keyboardType: TextInputType.number,
+                      style: AppText.body,
+                      decoration: InputDecoration(labelText: l10n.portalPrepTime),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _saving ? null : () => Navigator.of(context).pop(false),
+          child: Text(l10n.commonCancel),
+        ),
+        FilledButton(
+          onPressed: _saving ? null : () => _save(limits),
+          child: _saving
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                )
+              : Text(l10n.commonSave),
         ),
       ],
     );

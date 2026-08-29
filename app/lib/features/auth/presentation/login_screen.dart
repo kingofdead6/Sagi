@@ -6,7 +6,7 @@ import 'package:saji/app/theme/spacing.dart';
 import 'package:saji/app/theme/text_styles.dart';
 import 'package:saji/app/theme/tokens.dart';
 import 'package:saji/core/l10n_ext.dart';
-import 'package:saji/core/widgets/app_logo.dart';
+import 'package:saji/core/widgets/animated_logo.dart';
 import 'package:saji/core/phone.dart';
 import 'package:saji/core/widgets/primary_button.dart';
 import 'package:saji/features/auth/presentation/auth_controller.dart';
@@ -69,8 +69,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Center(
-                      child: const AppLogo.mark(size: 132),
+                    const Center(
+                      // Entrance only — this is not a loading state, so the
+                      // logo settles and stays put.
+                      child: AnimatedAppLogo(
+                        size: 132,
+                        onWhiteCircle: false,
+                        pulse: false,
+                      ),
                     ),
                     Gap.xl,
                     Text(l10n.welcomeTitle, style: AppText.sectionTitle, textAlign: TextAlign.center),

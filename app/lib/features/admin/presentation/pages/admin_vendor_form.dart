@@ -11,6 +11,7 @@ import 'package:saji/core/models/image_ref.dart';
 import 'package:saji/core/money.dart';
 import 'package:saji/core/network/image_upload_service.dart';
 import 'package:saji/core/result.dart';
+import 'package:saji/core/widgets/text_input_dialog.dart';
 import 'package:saji/features/admin/presentation/admin_controller.dart';
 import 'package:saji/features/admin/presentation/admin_image_field.dart';
 import 'package:saji/features/admin/presentation/admin_widgets.dart';
@@ -396,62 +397,40 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
   /// an account, so no pre-check is needed here.
   Future<void> _createAccount(String vendorId) async {
     final l10n = context.l10n;
-    final name = TextEditingController(text: _name.text);
-    final phone = TextEditingController();
-    final password = TextEditingController();
 
-    final submit = await showDialog<bool>(
+    // The dialog owns its controllers and disposes them with its own State,
+    // after the route is gone. Creating them here and disposing them as soon
+    // as showDialog returns tears them out from under fields that are still
+    // mounted for the exit animation.
+    final values = await showTextInputDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.adminVendorAccountCreate, style: AppText.adminSubheading),
-        content: SizedBox(
-          width: 360,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AdminField(label: l10n.authFullName, controller: name),
-              AdminField(
-                label: l10n.authPhone,
-                controller: phone,
-                keyboardType: TextInputType.phone,
-              ),
-              AdminField(label: l10n.authPassword, controller: password),
-            ],
-          ),
+      title: l10n.adminVendorAccountCreate,
+      titleStyle: AppText.adminSubheading,
+      width: 360,
+      fields: [
+        TextInputSpec(name: 'fullName', label: l10n.authFullName, initialValue: _name.text),
+        TextInputSpec(
+          name: 'phone',
+          label: l10n.authPhone,
+          keyboardType: TextInputType.phone,
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.commonCancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(l10n.commonSave),
-          ),
-        ],
-      ),
+        // Left visible: the admin sets this password and has to read it back
+        // to the shop owner, so masking it only invites a typo.
+        TextInputSpec(name: 'password', label: l10n.authPassword),
+      ],
     );
+    if (values == null || !mounted) return;
 
-    final ok = (submit ?? false) &&
-        name.text.trim().isNotEmpty &&
-        phone.text.trim().isNotEmpty &&
-        password.text.isNotEmpty;
-
-    final values = (
-      name: name.text.trim(),
-      phone: phone.text.trim(),
-      password: password.text,
-    );
-    for (final controller in [name, phone, password]) {
-      controller.dispose();
-    }
-    if (!ok || !mounted) return;
+    final fullName = values['fullName'] ?? '';
+    final phone = values['phone'] ?? '';
+    final password = values['password'] ?? '';
+    if (fullName.isEmpty || phone.isEmpty || password.isEmpty) return;
 
     final result = await ref.read(adminRepositoryProvider).createVendorAccount(
           vendorId,
-          fullName: values.name,
-          phone: values.phone,
-          password: values.password,
+          fullName: fullName,
+          phone: phone,
+          password: password,
         );
     if (!mounted) return;
 

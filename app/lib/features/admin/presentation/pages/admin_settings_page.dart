@@ -31,6 +31,8 @@ class _AdminSettingsPageState extends ConsumerState<AdminSettingsPage> {
   final _pointsPerHundred = TextEditingController();
   final _pointValue = TextEditingController();
   final _maxPointsPercent = TextEditingController();
+  final _minVendorFee = TextEditingController();
+  final _maxVendorFee = TextEditingController();
 
   bool _electronicPayment = false;
   bool _loaded = false;
@@ -48,6 +50,8 @@ class _AdminSettingsPageState extends ConsumerState<AdminSettingsPage> {
       _pointsPerHundred,
       _pointValue,
       _maxPointsPercent,
+      _minVendorFee,
+      _maxVendorFee,
     ]) {
       controller.dispose();
     }
@@ -66,6 +70,10 @@ class _AdminSettingsPageState extends ConsumerState<AdminSettingsPage> {
     _pointsPerHundred.text = '${settings.pointsPerHundredDinars}';
     _pointValue.text = '${settings.pointValueCentimes}';
     _maxPointsPercent.text = '${settings.maxPointsPercentOfSubtotal}';
+    _minVendorFee.text =
+        Money(settings.minVendorDeliveryFeeCentimes).dinars.toStringAsFixed(0);
+    _maxVendorFee.text =
+        Money(settings.maxVendorDeliveryFeeCentimes).dinars.toStringAsFixed(0);
     _electronicPayment = settings.electronicPaymentEnabled;
   }
 
@@ -85,6 +93,10 @@ class _AdminSettingsPageState extends ConsumerState<AdminSettingsPage> {
       'pointValueCentimes': int.tryParse(_pointValue.text.trim()) ?? 100,
       'maxPointsPercentOfSubtotal': num.tryParse(_maxPointsPercent.text.trim()) ?? 50,
       'electronicPaymentEnabled': _electronicPayment,
+      'minVendorDeliveryFeeCentimes':
+          Money.fromDinars(num.tryParse(_minVendorFee.text.trim()) ?? 0).centimes,
+      'maxVendorDeliveryFeeCentimes':
+          Money.fromDinars(num.tryParse(_maxVendorFee.text.trim()) ?? 0).centimes,
     });
 
     if (!mounted) return;
@@ -135,6 +147,17 @@ class _AdminSettingsPageState extends ConsumerState<AdminSettingsPage> {
                   AdminField(
                     label: l10n.settingsVipSurcharge,
                     controller: _vipSurcharge,
+                    keyboardType: TextInputType.number,
+                  ),
+                  // The window a shop may set its own delivery fee within.
+                  AdminField(
+                    label: l10n.settingsMinVendorFee,
+                    controller: _minVendorFee,
+                    keyboardType: TextInputType.number,
+                  ),
+                  AdminField(
+                    label: l10n.settingsMaxVendorFee,
+                    controller: _maxVendorFee,
                     keyboardType: TextInputType.number,
                   ),
                   Gap.lg,

@@ -105,6 +105,9 @@ abstract class PlatformSettings with _$PlatformSettings {
     @Default(100) int pointValueCentimes,
     @Default(50) num maxPointsPercentOfSubtotal,
     @Default(false) bool electronicPaymentEnabled,
+    // Bounds on the delivery fee a shop may set for itself, in centimes.
+    @Default(60000) int maxVendorDeliveryFeeCentimes,
+    @Default(5000) int minVendorDeliveryFeeCentimes,
   }) = _PlatformSettings;
 
   factory PlatformSettings.fromJson(Map<String, dynamic> json) => _$PlatformSettingsFromJson(json);

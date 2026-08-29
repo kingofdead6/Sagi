@@ -10,6 +10,7 @@ import 'package:saji/core/models/image_ref.dart';
 import 'package:saji/core/money.dart';
 import 'package:saji/core/network/image_upload_service.dart';
 import 'package:saji/core/result.dart';
+import 'package:saji/core/widgets/text_input_dialog.dart';
 import 'package:saji/core/widgets/empty_state.dart';
 import 'package:saji/core/widgets/error_retry.dart';
 import 'package:saji/core/widgets/price_text.dart';
@@ -504,30 +505,12 @@ class _SectionsPanel extends ConsumerWidget {
 
   Future<void> _create(BuildContext context, WidgetRef ref) async {
     final l10n = context.l10n;
-    final controller = TextEditingController();
-
-    final name = await showDialog<String>(
+    final name = await showSingleTextInputDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.adminSectionNew, style: AppText.adminSubheading),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: InputDecoration(labelText: l10n.adminSectionName),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.commonCancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(controller.text.trim()),
-            child: Text(l10n.commonSave),
-          ),
-        ],
-      ),
+      title: l10n.adminSectionNew,
+      titleStyle: AppText.adminSubheading,
+      label: l10n.adminSectionName,
     );
-    controller.dispose();
 
     if (name == null || name.isEmpty || !context.mounted) return;
 

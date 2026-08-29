@@ -12,6 +12,7 @@ import 'package:saji/core/map/map_view.dart';
 import 'package:saji/core/money.dart';
 import 'package:saji/core/phone.dart';
 import 'package:saji/core/result.dart';
+import 'package:saji/core/widgets/text_input_dialog.dart';
 import 'package:saji/core/widgets/app_skeleton.dart';
 import 'package:saji/core/widgets/error_retry.dart';
 import 'package:saji/core/widgets/price_text.dart';
@@ -237,33 +238,15 @@ class OrderDetailScreen extends ConsumerWidget {
 
   Future<void> _cancel(BuildContext context, WidgetRef ref, String id) async {
     final l10n = context.l10n;
-    final controller = TextEditingController();
-
-    final reason = await showDialog<String>(
+    final reason = await showSingleTextInputDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: Text(l10n.ordersCancelReason, style: AppText.cardTitle),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          style: AppText.body,
-          decoration: InputDecoration(hintText: l10n.ordersCancelReasonHint),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.commonCancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(controller.text.trim()),
-            style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
-            child: Text(l10n.commonConfirm),
-          ),
-        ],
-      ),
+      title: l10n.ordersCancelReason,
+      backgroundColor: AppColors.surface,
+      label: l10n.ordersCancelReason,
+      hint: l10n.ordersCancelReasonHint,
+      confirmLabel: l10n.commonConfirm,
+      danger: true,
     );
-    controller.dispose();
 
     if (reason == null || reason.length < 3 || !context.mounted) return;
 

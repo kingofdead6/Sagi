@@ -1363,9 +1363,6 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get portalSaved => 'تم الحفظ';
-
-  @override
   String get portalEmptyMessage => 'أضف أقسامك ومنتجاتك ليراها الزبائن';
 
   @override

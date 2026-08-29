@@ -2710,12 +2710,6 @@ abstract class AppLocalizations {
   /// **'المجال المسموح: {min} – {max}'**
   String portalFeeRange(String min, String max);
 
-  /// No description provided for @portalSaved.
-  ///
-  /// In ar, this message translates to:
-  /// **'تم الحفظ'**
-  String get portalSaved;
-
   /// No description provided for @portalEmptyMessage.
   ///
   /// In ar, this message translates to:

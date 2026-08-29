@@ -1379,9 +1379,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get portalSaved => 'Enregistré';
-
-  @override
   String get portalEmptyMessage =>
       'Ajoutez vos sections et produits pour que les clients les voient';
 

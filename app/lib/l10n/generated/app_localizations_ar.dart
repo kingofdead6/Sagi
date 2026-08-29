@@ -1156,6 +1156,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsServiceFee => 'رسوم الخدمة';
 
   @override
+  String get settingsMinVendorFee => 'أدنى سعر توصيل للمتجر';
+
+  @override
+  String get settingsMaxVendorFee => 'أقصى سعر توصيل للمتجر';
+
+  @override
   String get settingsVipSurcharge => 'رسوم VIP الإضافية';
 
   @override
@@ -1329,6 +1335,35 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get portalEmptyTitle => 'القائمة فارغة';
+
+  @override
+  String get portalDelivery => 'التوصيل';
+
+  @override
+  String get portalDeliveryFee => 'سعر التوصيل';
+
+  @override
+  String get portalDeliveryFeeHint => 'ما يدفعه الزبون مقابل التوصيل من متجرك';
+
+  @override
+  String get portalMinOrder => 'الحد الأدنى للطلب';
+
+  @override
+  String get portalPrepTime => 'مدة التحضير (دقيقة)';
+
+  @override
+  String get portalPrepTimeTo => 'إلى';
+
+  @override
+  String get portalEditDelivery => 'تعديل إعدادات التوصيل';
+
+  @override
+  String portalFeeRange(String min, String max) {
+    return 'المجال المسموح: $min – $max';
+  }
+
+  @override
+  String get portalSaved => 'تم الحفظ';
 
   @override
   String get portalEmptyMessage => 'أضف أقسامك ومنتجاتك ليراها الزبائن';

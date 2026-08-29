@@ -36,6 +36,7 @@ class _AdminSettingsPageState extends ConsumerState<AdminSettingsPage> {
 
   bool _electronicPayment = false;
   bool _loaded = false;
+  bool _boundsLoaded = false;
   bool _saving = false;
 
   @override
@@ -58,6 +59,17 @@ class _AdminSettingsPageState extends ConsumerState<AdminSettingsPage> {
     super.dispose();
   }
 
+  /// The vendor fee bounds are not on [PlatformSettings]; they come from the
+  /// raw settings map and land whenever that provider resolves.
+  void _hydrateBounds(Map<String, dynamic> raw) {
+    if (_boundsLoaded) return;
+    _boundsLoaded = true;
+    _minVendorFee.text =
+        Money.fromJson(raw['minVendorDeliveryFeeCentimes']).dinars.toStringAsFixed(0);
+    _maxVendorFee.text =
+        Money.fromJson(raw['maxVendorDeliveryFeeCentimes']).dinars.toStringAsFixed(0);
+  }
+
   void _hydrate(PlatformSettings settings) {
     if (_loaded) return;
     _loaded = true;
@@ -70,10 +82,6 @@ class _AdminSettingsPageState extends ConsumerState<AdminSettingsPage> {
     _pointsPerHundred.text = '${settings.pointsPerHundredDinars}';
     _pointValue.text = '${settings.pointValueCentimes}';
     _maxPointsPercent.text = '${settings.maxPointsPercentOfSubtotal}';
-    _minVendorFee.text =
-        Money(settings.minVendorDeliveryFeeCentimes).dinars.toStringAsFixed(0);
-    _maxVendorFee.text =
-        Money(settings.maxVendorDeliveryFeeCentimes).dinars.toStringAsFixed(0);
     _electronicPayment = settings.electronicPaymentEnabled;
   }
 
@@ -104,7 +112,9 @@ class _AdminSettingsPageState extends ConsumerState<AdminSettingsPage> {
 
     switch (result) {
       case Ok():
-        ref.invalidate(adminSettingsProvider);
+        ref
+          ..invalidate(adminSettingsProvider)
+          ..invalidate(adminSettingsRawProvider);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.l10n.settingsSaved)),
         );
@@ -128,6 +138,8 @@ class _AdminSettingsPageState extends ConsumerState<AdminSettingsPage> {
       ),
       data: (data) {
         _hydrate(data);
+        final raw = ref.watch(adminSettingsRawProvider).valueOrNull;
+        if (raw != null) _hydrateBounds(raw);
 
         return ListView(
           padding: const EdgeInsets.all(AppSpacing.lg),

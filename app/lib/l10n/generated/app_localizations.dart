@@ -2326,6 +2326,18 @@ abstract class AppLocalizations {
   /// **'رسوم الخدمة'**
   String get settingsServiceFee;
 
+  /// No description provided for @settingsMinVendorFee.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدنى سعر توصيل للمتجر'**
+  String get settingsMinVendorFee;
+
+  /// No description provided for @settingsMaxVendorFee.
+  ///
+  /// In ar, this message translates to:
+  /// **'أقصى سعر توصيل للمتجر'**
+  String get settingsMaxVendorFee;
+
   /// No description provided for @settingsVipSurcharge.
   ///
   /// In ar, this message translates to:
@@ -2649,6 +2661,60 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'القائمة فارغة'**
   String get portalEmptyTitle;
+
+  /// No description provided for @portalDelivery.
+  ///
+  /// In ar, this message translates to:
+  /// **'التوصيل'**
+  String get portalDelivery;
+
+  /// No description provided for @portalDeliveryFee.
+  ///
+  /// In ar, this message translates to:
+  /// **'سعر التوصيل'**
+  String get portalDeliveryFee;
+
+  /// No description provided for @portalDeliveryFeeHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ما يدفعه الزبون مقابل التوصيل من متجرك'**
+  String get portalDeliveryFeeHint;
+
+  /// No description provided for @portalMinOrder.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحد الأدنى للطلب'**
+  String get portalMinOrder;
+
+  /// No description provided for @portalPrepTime.
+  ///
+  /// In ar, this message translates to:
+  /// **'مدة التحضير (دقيقة)'**
+  String get portalPrepTime;
+
+  /// No description provided for @portalPrepTimeTo.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلى'**
+  String get portalPrepTimeTo;
+
+  /// No description provided for @portalEditDelivery.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعديل إعدادات التوصيل'**
+  String get portalEditDelivery;
+
+  /// No description provided for @portalFeeRange.
+  ///
+  /// In ar, this message translates to:
+  /// **'المجال المسموح: {min} – {max}'**
+  String portalFeeRange(String min, String max);
+
+  /// No description provided for @portalSaved.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم الحفظ'**
+  String get portalSaved;
 
   /// No description provided for @portalEmptyMessage.
   ///

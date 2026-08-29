@@ -348,6 +348,16 @@ class AdminRepository {
         parse: (data) => PlatformSettings.fromJson(data as Map<String, dynamic>),
       );
 
+  /// The same document as [settings], untyped.
+  ///
+  /// [PlatformSettings] is a freezed model, so every key it exposes costs a
+  /// codegen round. Settings that are only ever read and written as a number —
+  /// the vendor delivery-fee bounds — are read from here instead.
+  Future<Result<Map<String, dynamic>>> settingsRaw() => _client.get<Map<String, dynamic>>(
+        Api.adminSettings,
+        parse: (data) => (data as Map<String, dynamic>?) ?? const {},
+      );
+
   Future<Result<PlatformSettings>> updateSettings(Map<String, dynamic> patch) =>
       _client.patch<PlatformSettings>(
         Api.adminSettings,

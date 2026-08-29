@@ -585,7 +585,6 @@
   "@portalFeeRange": {
     "placeholders": { "min": {"type": "String"}, "max": {"type": "String"} }
   },
-  "portalSaved": "تم الحفظ",
   "portalEmptyMessage": "أضف أقسامك ومنتجاتك ليراها الزبائن",
   "adminVendorAccount": "حساب المتجر",
   "adminVendorAccountCreate": "إنشاء حساب دخول",

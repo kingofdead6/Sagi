@@ -133,3 +133,13 @@ final adminSettingsProvider = FutureProvider.autoDispose<PlatformSettings>((ref)
     Err(:final failure) => throw failure,
   };
 });
+
+/// The settings document untyped, for keys [PlatformSettings] does not model.
+final adminSettingsRawProvider =
+    FutureProvider.autoDispose<Map<String, dynamic>>((ref) async {
+  final result = await ref.watch(adminRepositoryProvider).settingsRaw();
+  return switch (result) {
+    Ok(:final value) => value,
+    Err(:final failure) => throw failure,
+  };
+});

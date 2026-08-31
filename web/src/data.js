@@ -4,10 +4,10 @@
  */
 
 /** Where the download button points. Kept here because it changes per deploy. */
-export const APK_URL = 'https://github.com/kingofdead6/Sagi/releases/download/v0/Saji.apk';
+export const APK_URL = 'https://saji-app-vu79.vercel.app/Sagi.apk';
 
 /** Shown next to the button so nobody starts a 22MB download blind. */
-export const APK_SIZE = '22 ميغابايت';
+export const APK_SIZE = '72 ميغابايت';
 
 export const APK_MIN_ANDROID = 'أندرويد 6 أو أحدث';
 

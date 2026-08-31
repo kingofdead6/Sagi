@@ -1159,12 +1159,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsServiceFee => 'Service fee';
 
   @override
-  String get settingsMinVendorFee => 'Minimum store delivery fee';
-
-  @override
-  String get settingsMaxVendorFee => 'Maximum store delivery fee';
-
-  @override
   String get settingsVipSurcharge => 'VIP surcharge';
 
   @override
@@ -1341,33 +1335,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get portalEmptyTitle => 'Your menu is empty';
-
-  @override
-  String get portalDelivery => 'Delivery';
-
-  @override
-  String get portalDeliveryFee => 'Delivery fee';
-
-  @override
-  String get portalDeliveryFeeHint =>
-      'What customers pay for delivery from your store';
-
-  @override
-  String get portalMinOrder => 'Minimum order';
-
-  @override
-  String get portalPrepTime => 'Preparation time (min)';
-
-  @override
-  String get portalPrepTimeTo => 'to';
-
-  @override
-  String get portalEditDelivery => 'Edit delivery settings';
-
-  @override
-  String portalFeeRange(String min, String max) {
-    return 'Allowed range: $min – $max';
-  }
 
   @override
   String get portalEmptyMessage =>

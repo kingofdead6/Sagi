@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:saji/core/network/api_endpoints.dart';
-import 'package:saji/core/money.dart';
 import 'package:saji/core/network/dio_client.dart';
 import 'package:saji/core/providers/core_providers.dart';
 import 'package:saji/core/result.dart';
@@ -19,22 +18,10 @@ class PortalRepository {
         parse: (data) => Vendor.fromJson(data as Map<String, dynamic>),
       );
 
-  Future<Result<Vendor>> setOpen({required bool isOpen}) =>
-      updateShop({'isOpen': isOpen});
-
-  /// Patches the shop-level fields the owner controls. Only the keys present
-  /// are changed, so callers send the one thing they edited.
-  Future<Result<Vendor>> updateShop(Map<String, dynamic> body) => _client.patch<Vendor>(
+  Future<Result<Vendor>> setOpen({required bool isOpen}) => _client.patch<Vendor>(
         Api.portalMe,
-        body: body,
+        body: {'isOpen': isOpen},
         parse: (data) => Vendor.fromJson(data as Map<String, dynamic>),
-      );
-
-  /// The bounds the server checks the delivery fee against, so the form can
-  /// label them and reject a bad value before the round trip.
-  Future<Result<PortalLimits>> limits() => _client.get<PortalLimits>(
-        Api.portalLimits,
-        parse: (data) => PortalLimits.fromJson(data as Map<String, dynamic>),
       );
 
   Future<Result<List<MenuSection>>> sections() => _client.get<List<MenuSection>>(
@@ -84,33 +71,12 @@ class PortalRepository {
       .toList();
 }
 
-/// The platform-set floor and ceiling on a shop's own delivery fee.
-class PortalLimits {
-  const PortalLimits({required this.minDeliveryFee, required this.maxDeliveryFee});
-
-  factory PortalLimits.fromJson(Map<String, dynamic> json) => PortalLimits(
-        minDeliveryFee: Money.fromJson(json['minDeliveryFeeCentimes']),
-        maxDeliveryFee: Money.fromJson(json['maxDeliveryFeeCentimes']),
-      );
-
-  final Money minDeliveryFee;
-  final Money maxDeliveryFee;
-}
-
 final portalRepositoryProvider = Provider<PortalRepository>(
   (ref) => PortalRepository(ref.watch(apiClientProvider)),
 );
 
 final portalVendorProvider = FutureProvider.autoDispose<Vendor>((ref) async {
   final result = await ref.watch(portalRepositoryProvider).me();
-  return switch (result) {
-    Ok(:final value) => value,
-    Err(:final failure) => throw failure,
-  };
-});
-
-final portalLimitsProvider = FutureProvider.autoDispose<PortalLimits>((ref) async {
-  final result = await ref.watch(portalRepositoryProvider).limits();
   return switch (result) {
     Ok(:final value) => value,
     Err(:final failure) => throw failure,

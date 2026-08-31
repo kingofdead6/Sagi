@@ -72,7 +72,6 @@ abstract final class Api {
 
   // vendor portal — the shop owner's own menu
   static const portalMe = '$prefix/portal/me';
-  static const portalLimits = '$prefix/portal/limits';
   static const portalSections = '$prefix/portal/sections';
   static String portalSection(String id) => '$prefix/portal/sections/$id';
   static const portalProducts = '$prefix/portal/products';

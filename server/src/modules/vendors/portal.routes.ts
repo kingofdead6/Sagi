@@ -11,16 +11,14 @@ import { MenuSection, Vendor, type VendorDoc } from './vendor.model';
 import { Product } from '../products/product.model';
 import { menuSectionSchema } from './vendor.schema';
 import { createProductSchema, reorderSchema } from '../admin/admin.schema';
-import { getSettings } from '../settings/settings.service';
 import type { Request } from 'express';
 
 /**
  * The shop owner's portal.
  *
- * A vendor signs in and manages their own menu — sections, products, prices
- * and availability — plus the commercial terms of their own delivery: the fee
- * they charge and the minimum order they accept. Everything else (delivery
- * area, orders, assignment) stays with the admin, so none of it is exposed.
+ * A vendor signs in and manages exactly one thing: their own menu — sections,
+ * products, prices and availability. Everything else (fees, delivery area,
+ * orders, assignment) stays with the admin, so none of it is exposed here.
  *
  * Every route resolves the caller's own shop first and scopes the query to it;
  * an id in the URL is never trusted on its own.
@@ -49,75 +47,18 @@ vendorPortalRouter.get(
 );
 
 /**
- * The shop-level fields a vendor controls for themselves: whether they are
- * accepting orders, and the commercial terms of their own delivery.
- *
- * The fee is bounded by platform settings rather than left free — a shop that
- * sets it below the agent payout, or high enough to look like a mistake to a
- * customer, is a support ticket either way. The pickup point and delivery
- * area remain admin-owned.
+ * The only shop-level field a vendor controls: whether they are accepting
+ * orders right now. Fees, minimum order, prep time and the pickup point are
+ * set by the admin per shop — a vendor cannot touch its own delivery pricing.
  */
 vendorPortalRouter.patch(
   '/me',
-  validate({
-    body: z
-      .object({
-        isOpen: z.boolean(),
-        deliveryFeeCentimes: z.number().int().min(0),
-        minOrderCentimes: z.number().int().min(0).max(1_000_000),
-        prepTimeMin: z.number().int().min(0).max(240),
-        prepTimeMax: z.number().int().min(0).max(240),
-      })
-      .partial()
-      // An empty body would silently "succeed" without changing anything.
-      .refine((body) => Object.keys(body).length > 0, 'لا يوجد أي تغيير'),
-  }),
+  validate({ body: z.object({ isOpen: z.boolean() }) }),
   asyncHandler(async (req, res) => {
     const vendor = await myVendor(req);
-    const body = req.body as {
-      isOpen?: boolean;
-      deliveryFeeCentimes?: number;
-      minOrderCentimes?: number;
-      prepTimeMin?: number;
-      prepTimeMax?: number;
-    };
-
-    if (body.deliveryFeeCentimes !== undefined) {
-      const settings = await getSettings();
-      const { minVendorDeliveryFeeCentimes: min, maxVendorDeliveryFeeCentimes: max } =
-        settings;
-      if (body.deliveryFeeCentimes < min || body.deliveryFeeCentimes > max) {
-        throw ApiError.badRequest(
-          `سعر التوصيل يجب أن يكون بين ${min / 100} و ${max / 100} د.ج`,
-        );
-      }
-      vendor.deliveryFeeCentimes = body.deliveryFeeCentimes;
-    }
-
-    if (body.isOpen !== undefined) vendor.isOpen = body.isOpen;
-    if (body.minOrderCentimes !== undefined) vendor.minOrderCentimes = body.minOrderCentimes;
-    if (body.prepTimeMin !== undefined) vendor.prepTimeMin = body.prepTimeMin;
-    if (body.prepTimeMax !== undefined) vendor.prepTimeMax = body.prepTimeMax;
-
-    // A window that closes before it opens would make every quoted ETA wrong.
-    if (vendor.prepTimeMax < vendor.prepTimeMin) {
-      throw ApiError.badRequest('أقصى مدة تحضير لا يمكن أن تكون أقل من أدناها');
-    }
-
+    vendor.isOpen = req.body.isOpen as boolean;
     await vendor.save();
-    return ok(res, vendor.toJSON(), 'تم تحديث المتجر');
-  }),
-);
-
-/** The bounds the fee above is checked against, for the portal's own UI. */
-vendorPortalRouter.get(
-  '/limits',
-  asyncHandler(async (_req, res) => {
-    const settings = await getSettings();
-    return ok(res, {
-      minDeliveryFeeCentimes: settings.minVendorDeliveryFeeCentimes,
-      maxDeliveryFeeCentimes: settings.maxVendorDeliveryFeeCentimes,
-    });
+    return ok(res, vendor.toJSON(), 'تم تحديث حالة المتجر');
   }),
 );
 

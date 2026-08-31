@@ -138,9 +138,25 @@ class ProfileScreen extends ConsumerWidget {
 
           _Group(
             title: l10n.profileFollowUs,
-            children: const [
-              _Tile(icon: Icons.facebook_rounded, label: 'Facebook'),
-              _Tile(icon: Icons.camera_alt_outlined, label: 'Instagram'),
+            children: [
+              _Tile(
+                icon: Icons.facebook_rounded,
+                label: 'Facebook',
+                onTap: () => launchUrl(
+                  Uri.parse('https://www.facebook.com/share/191Bv4W78V/'),
+                  mode: LaunchMode.externalApplication,
+                ),
+              ),
+              _Tile(
+                icon: Icons.camera_alt_outlined,
+                label: 'Instagram',
+                onTap: () => launchUrl(
+                  Uri.parse(
+                    'https://www.instagram.com/saji_super_app?igsi=eXQ4cG5iNXN3dXlj',
+                  ),
+                  mode: LaunchMode.externalApplication,
+                ),
+              ),
             ],
           ),
 

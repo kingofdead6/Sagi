@@ -12,10 +12,6 @@ export interface PlatformSettings {
   pointValueCentimes: number;
   maxPointsPercentOfSubtotal: number;
   electronicPaymentEnabled: boolean;
-  /** Ceiling on the delivery fee a shop may set for itself, in centimes. */
-  maxVendorDeliveryFeeCentimes: number;
-  /** Floor on the same, so a shop cannot undercut the agent's payout. */
-  minVendorDeliveryFeeCentimes: number;
 }
 
 export const DEFAULT_SETTINGS: PlatformSettings = {
@@ -29,8 +25,6 @@ export const DEFAULT_SETTINGS: PlatformSettings = {
   pointValueCentimes: 100, // 1 point = 1 د.ج
   maxPointsPercentOfSubtotal: 50,
   electronicPaymentEnabled: false,
-  maxVendorDeliveryFeeCentimes: 60000, // 600 د.ج
-  minVendorDeliveryFeeCentimes: 5000, // 50 د.ج
 };
 
 const CACHE_TTL_MS = 30_000;

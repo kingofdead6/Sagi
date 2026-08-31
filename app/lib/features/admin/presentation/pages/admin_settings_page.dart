@@ -31,12 +31,9 @@ class _AdminSettingsPageState extends ConsumerState<AdminSettingsPage> {
   final _pointsPerHundred = TextEditingController();
   final _pointValue = TextEditingController();
   final _maxPointsPercent = TextEditingController();
-  final _minVendorFee = TextEditingController();
-  final _maxVendorFee = TextEditingController();
 
   bool _electronicPayment = false;
   bool _loaded = false;
-  bool _boundsLoaded = false;
   bool _saving = false;
 
   @override
@@ -51,23 +48,10 @@ class _AdminSettingsPageState extends ConsumerState<AdminSettingsPage> {
       _pointsPerHundred,
       _pointValue,
       _maxPointsPercent,
-      _minVendorFee,
-      _maxVendorFee,
     ]) {
       controller.dispose();
     }
     super.dispose();
-  }
-
-  /// The vendor fee bounds are not on [PlatformSettings]; they come from the
-  /// raw settings map and land whenever that provider resolves.
-  void _hydrateBounds(Map<String, dynamic> raw) {
-    if (_boundsLoaded) return;
-    _boundsLoaded = true;
-    _minVendorFee.text =
-        Money.fromJson(raw['minVendorDeliveryFeeCentimes']).dinars.toStringAsFixed(0);
-    _maxVendorFee.text =
-        Money.fromJson(raw['maxVendorDeliveryFeeCentimes']).dinars.toStringAsFixed(0);
   }
 
   void _hydrate(PlatformSettings settings) {
@@ -101,10 +85,6 @@ class _AdminSettingsPageState extends ConsumerState<AdminSettingsPage> {
       'pointValueCentimes': int.tryParse(_pointValue.text.trim()) ?? 100,
       'maxPointsPercentOfSubtotal': num.tryParse(_maxPointsPercent.text.trim()) ?? 50,
       'electronicPaymentEnabled': _electronicPayment,
-      'minVendorDeliveryFeeCentimes':
-          Money.fromDinars(num.tryParse(_minVendorFee.text.trim()) ?? 0).centimes,
-      'maxVendorDeliveryFeeCentimes':
-          Money.fromDinars(num.tryParse(_maxVendorFee.text.trim()) ?? 0).centimes,
     });
 
     if (!mounted) return;
@@ -112,9 +92,7 @@ class _AdminSettingsPageState extends ConsumerState<AdminSettingsPage> {
 
     switch (result) {
       case Ok():
-        ref
-          ..invalidate(adminSettingsProvider)
-          ..invalidate(adminSettingsRawProvider);
+        ref.invalidate(adminSettingsProvider);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.l10n.settingsSaved)),
         );
@@ -138,8 +116,6 @@ class _AdminSettingsPageState extends ConsumerState<AdminSettingsPage> {
       ),
       data: (data) {
         _hydrate(data);
-        final raw = ref.watch(adminSettingsRawProvider).valueOrNull;
-        if (raw != null) _hydrateBounds(raw);
 
         return ListView(
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -159,17 +135,6 @@ class _AdminSettingsPageState extends ConsumerState<AdminSettingsPage> {
                   AdminField(
                     label: l10n.settingsVipSurcharge,
                     controller: _vipSurcharge,
-                    keyboardType: TextInputType.number,
-                  ),
-                  // The window a shop may set its own delivery fee within.
-                  AdminField(
-                    label: l10n.settingsMinVendorFee,
-                    controller: _minVendorFee,
-                    keyboardType: TextInputType.number,
-                  ),
-                  AdminField(
-                    label: l10n.settingsMaxVendorFee,
-                    controller: _maxVendorFee,
                     keyboardType: TextInputType.number,
                   ),
                   Gap.lg,

@@ -4,7 +4,7 @@ import 'package:saji/app/theme/spacing.dart';
 import 'package:saji/app/theme/text_styles.dart';
 import 'package:saji/app/theme/tokens.dart';
 import 'package:saji/core/l10n_ext.dart';
-import 'package:saji/core/widgets/animated_logo.dart';
+import 'package:saji/core/widgets/splash_logo_video.dart';
 import 'package:saji/features/auth/presentation/auth_controller.dart';
 
 /// Restores the stored session before the router decides where to go.
@@ -34,7 +34,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const AnimatedAppLogo(size: 108),
+            const SplashLogoVideo(size: 160),
             Gap.xl,
             // The wordmark and tagline follow the logo in rather than landing
             // with it, so the eye reaches the name after the mark has settled.

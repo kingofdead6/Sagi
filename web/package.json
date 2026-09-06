@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Saji landing page \u2014 product overview and Android download",
+  "description": "Saji landing page — product overview and Android download",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

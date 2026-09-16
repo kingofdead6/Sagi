@@ -21,6 +21,7 @@ import { Product } from '../products/product.model';
 import { Offer } from '../offers/offer.model';
 import { Voucher } from '../vouchers/voucher.model';
 import { User } from '../users/user.model';
+import { Rating } from '../ratings/rating.model';
 import { AgentStatus } from '../agents/agent.model';
 import { point } from '../../utils/geo';
 import { createVendorSchema, menuSectionSchema, updateVendorSchema } from '../vendors/vendor.schema';
@@ -36,6 +37,7 @@ import {
   createOfferSchema,
   createProductSchema,
   createVoucherSchema,
+  deleteVendorQuerySchema,
   listUsersQuerySchema,
   rangeQuerySchema,
   reorderSchema,
@@ -265,6 +267,63 @@ adminRouter.delete(
     );
     if (!doc) throw ApiError.notFound('المتجر غير موجود');
     return ok(res, doc.toJSON(), 'تم تعطيل المتجر');
+  }),
+);
+
+/**
+ * Permanently delete a shop and everything that belongs to it: menu sections,
+ * products, its own offers, its ratings and the owner's login.
+ *
+ * Orders are the financial record, so they are never deleted — which is why a
+ * shop with open orders can't go, and a shop with past orders needs `force`
+ * after the admin has been told how many orders will be left without a shop.
+ */
+adminRouter.delete(
+  '/vendors/:id/permanent',
+  validate({ params: idParams, query: deleteVendorQuerySchema }),
+  asyncHandler(async (req, res) => {
+    const vendor = await Vendor.findById(req.params.id);
+    if (!vendor) throw ApiError.notFound('المتجر غير موجود');
+
+    const [openOrders, pastOrders] = await Promise.all([
+      Order.countDocuments({ vendor: vendor._id, status: { $nin: ['delivered', 'cancelled'] } }),
+      Order.countDocuments({ vendor: vendor._id, status: { $in: ['delivered', 'cancelled'] } }),
+    ]);
+    if (openOrders > 0) throw ApiError.conflict('لا يمكن حذف متجر لديه طلبات جارية');
+
+    const { force } = req.query as unknown as { force: boolean };
+    if (pastOrders > 0 && !force) {
+      throw ApiError.conflict(
+        `لهذا المتجر ${pastOrders} طلب سابق. أكّد الحذف النهائي للمتابعة (ستبقى الطلبات في السجل بدون متجر)`,
+        { requiresForce: true, pastOrders },
+      );
+    }
+
+    // Collect the Cloudinary assets before the records that point at them go.
+    const [products, offers] = await Promise.all([
+      Product.find({ vendor: vendor._id }).select('image'),
+      Offer.find({ vendor: vendor._id }).select('image'),
+    ]);
+    const publicIds = [
+      vendor.logo?.publicId,
+      vendor.cover?.publicId,
+      ...products.map((p) => p.image?.publicId),
+      ...offers.map((o) => o.image?.publicId),
+    ].filter((id): id is string => Boolean(id));
+
+    await Promise.all([
+      Product.deleteMany({ vendor: vendor._id }),
+      MenuSection.deleteMany({ vendor: vendor._id }),
+      Offer.deleteMany({ vendor: vendor._id }),
+      Rating.deleteMany({ vendor: vendor._id }),
+      vendor.owner ? User.findByIdAndDelete(vendor.owner) : Promise.resolve(null),
+    ]);
+    await Vendor.findByIdAndDelete(vendor._id);
+
+    // Images last: a failed destroy only leaks an asset, it can't resurrect a shop.
+    for (const publicId of publicIds) await destroyImage(publicId);
+
+    return ok(res, null, 'تم حذف المتجر نهائيًا');
   }),
 );
 

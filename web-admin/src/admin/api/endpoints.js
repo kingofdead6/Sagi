@@ -45,6 +45,10 @@ export const vendorsApi = {
   create: (body) => unwrap(api.post('/admin/vendors', body)),
   update: (id, body) => unwrap(api.patch(`/admin/vendors/${id}`, body)),
   remove: (id) => unwrap(api.delete(`/admin/vendors/${id}`)),
+  // Permanent: wipes the shop, its menu and its offers. `force` is required
+  // once the shop has past orders — those stay in the record either way.
+  destroy: (id, { force } = {}) =>
+    unwrap(api.delete(`/admin/vendors/${id}/permanent`, { params: force ? { force: true } : undefined })),
   createAccount: (id, body) => unwrap(api.post(`/admin/vendors/${id}/account`, body)),
   removeAccount: (id) => unwrap(api.delete(`/admin/vendors/${id}/account`)),
   sections: (id) => unwrap(api.get(`/admin/vendors/${id}/sections`)),

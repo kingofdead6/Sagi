@@ -483,6 +483,11 @@ function SectionsCard({ vendorId }) {
 
 function DangerCard({ vendor, navigate }) {
   const [confirmDisable, setConfirmDisable] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [typedName, setTypedName] = useState('');
+  // Set when the server reports the shop has past orders: the delete then needs
+  // a second, explicit confirmation.
+  const [forceNotice, setForceNotice] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
 
@@ -501,6 +506,34 @@ function DangerCard({ vendor, navigate }) {
     }
   }
 
+  function openDelete() {
+    setTypedName('');
+    setForceNotice(null);
+    setError(null);
+    setConfirmDelete(true);
+  }
+
+  async function handleDelete(force = false) {
+    setBusy(true);
+    setError(null);
+    try {
+      await vendorsApi.destroy(vendor.id, { force });
+      setConfirmDelete(false);
+      navigate('/vendors');
+    } catch (err) {
+      const message = apiErrorMessage(err);
+      // Past orders: keep the dialog open and ask once more, this time with force.
+      if (!force && err?.response?.data?.details?.requiresForce) {
+        setForceNotice(message);
+      } else {
+        setError(message);
+        setConfirmDelete(false);
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <Card className="mt-6 ring-red-100">
       <h2 className="mb-2 text-lg font-black text-red-700">منطقة الخطر</h2>
@@ -511,6 +544,14 @@ function DangerCard({ vendor, navigate }) {
           تعطيل المتجر
         </Button>
       </div>
+      <div className="mt-4 flex items-center justify-between border-t border-red-100 pt-4">
+        <p className="text-sm text-ink-soft">
+          الحذف النهائي يمسح المتجر وقائمته ومنتجاته وعروضه وحساب صاحبه. لا يمكن التراجع عنه.
+        </p>
+        <Button variant="danger" onClick={openDelete}>
+          حذف المتجر نهائيًا
+        </Button>
+      </div>
       <ConfirmModal
         open={confirmDisable}
         onClose={() => setConfirmDisable(false)}
@@ -519,6 +560,40 @@ function DangerCard({ vendor, navigate }) {
         title="تعطيل المتجر"
         message={`هل تريد تعطيل "${vendor.name}"؟`}
       />
+      <Modal
+        open={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        title="حذف المتجر نهائيًا"
+        width="max-w-sm"
+      >
+        <p className="text-sm text-ink-soft">
+          سيُحذف "{vendor.name}" وكل أقسامه ومنتجاته وعروضه وتقييماته وحساب صاحبه. الطلبات السابقة تبقى
+          في السجل. لا يمكن التراجع عن هذا الإجراء.
+        </p>
+        <div className="mt-4">
+          <Input
+            label={`اكتب اسم المتجر للتأكيد: ${vendor.name}`}
+            value={typedName}
+            onChange={(e) => setTypedName(e.target.value)}
+            placeholder={vendor.name}
+          />
+        </div>
+        {forceNotice && (
+          <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-sm font-bold text-red-700">{forceNotice}</p>
+        )}
+        <div className="mt-5 flex justify-end gap-2">
+          <Button variant="ghost" onClick={() => setConfirmDelete(false)}>
+            إلغاء
+          </Button>
+          <Button
+            variant="danger"
+            disabled={busy || typedName.trim() !== vendor.name}
+            onClick={() => handleDelete(Boolean(forceNotice))}
+          >
+            {busy ? <Spinner className="h-4 w-4" /> : forceNotice ? 'نعم، احذف نهائيًا' : 'حذف نهائي'}
+          </Button>
+        </div>
+      </Modal>
     </Card>
   );
 }

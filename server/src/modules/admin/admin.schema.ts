@@ -160,3 +160,15 @@ export const listUsersQuerySchema = z.object({
 });
 
 export const updateSettingsSchema = z.record(z.union([z.string(), z.number(), z.boolean()]));
+
+/**
+ * Permanently deleting a shop that already served orders is a decision, not a
+ * default: the admin has to say `force=true` after being told how many orders
+ * are involved.
+ */
+export const deleteVendorQuerySchema = z.object({
+  force: z
+    .enum(['true', 'false'])
+    .optional()
+    .transform((v) => v === 'true'),
+});

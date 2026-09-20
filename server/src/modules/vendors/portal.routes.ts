@@ -133,8 +133,19 @@ vendorPortalRouter.post(
   validate({ body: createProductSchema.omit({ vendor: true }) }),
   asyncHandler(async (req, res) => {
     const vendor = await myVendor(req);
-    const doc = await Product.create({ ...req.body, vendor: vendor._id });
-    return created(res, doc.toJSON(), 'تمت إضافة المنتج');
+    // A shop never publishes directly: the product enters the review queue and
+    // only an admin can approve it. Status is forced here so a crafted body
+    // cannot ship an approved product.
+    const doc = await Product.create({
+      ...req.body,
+      vendor: vendor._id,
+      status: 'pending',
+      rejectionReason: null,
+      reviewedBy: null,
+      reviewedAt: null,
+      submittedAt: new Date(),
+    });
+    return created(res, doc.toJSON(), 'تم إرسال المنتج للمراجعة');
   }),
 );
 
@@ -159,12 +170,35 @@ vendorPortalRouter.patch(
       await destroyImage(existing.image.publicId);
     }
 
+    // Editing an approved product pulls it back into review — the shop cannot
+    // get a change in front of customers without an admin seeing it. Toggling
+    // availability alone is exempt: that is stock management, not new content.
+    const contentKeys = Object.keys(req.body).filter((k) => k !== 'isAvailable' && k !== 'sortOrder');
+    const needsReview = contentKeys.length > 0;
+
     const doc = await Product.findOneAndUpdate(
       { _id: req.params.id, vendor: vendor._id },
-      { $set: req.body },
+      {
+        $set: {
+          ...req.body,
+          ...(needsReview
+            ? {
+                status: 'pending',
+                rejectionReason: null,
+                reviewedBy: null,
+                reviewedAt: null,
+                submittedAt: new Date(),
+              }
+            : {}),
+        },
+      },
       { new: true },
     );
-    return ok(res, doc!.toJSON(), 'تم تحديث المنتج');
+    return ok(
+      res,
+      doc!.toJSON(),
+      needsReview ? 'تم إرسال التعديل للمراجعة' : 'تم تحديث المنتج',
+    );
   }),
 );
 

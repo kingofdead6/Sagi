@@ -1369,6 +1369,63 @@ class AppLocalizationsFr extends AppLocalizations {
   String get adminVendorAccountRevoke => 'Supprimer le compte';
 
   @override
+  String get adminVendorAccountEdit => 'Modifier le compte';
+
+  @override
+  String get adminVendorAccountNewPassword => 'Nouveau mot de passe (laisser vide pour conserver)';
+
+  @override
+  String get adminVendorAccountCreated => 'Accès créé';
+
+  @override
+  String get adminVendorAccountUpdated => 'Compte mis à jour';
+
+  @override
+  String get adminVendorAccountRevoked => 'Compte supprimé';
+
+  @override
+  String get adminProductStatusPending => 'En attente de validation';
+
+  @override
+  String get adminProductStatusApproved => 'Publié';
+
+  @override
+  String get adminProductStatusRejected => 'Refusé';
+
+  @override
+  String get adminProductApprove => 'Valider';
+
+  @override
+  String get adminProductReject => 'Refuser';
+
+  @override
+  String get adminProductRejectReason => 'Motif du refus';
+
+  @override
+  String get adminProductApproved => 'Produit publié';
+
+  @override
+  String get adminProductRejected => 'Produit refusé';
+
+  @override
+  String get adminProductsPendingFilter => 'En attente de validation';
+
+  @override
+  String get adminProductsAllFilter => 'Tous les produits';
+
+  @override
+  String get portalProductPending => 'En attente de validation de l\'administrateur';
+
+  @override
+  String get portalProductRejected => 'Refusé';
+
+  @override
+  String get portalProductSubmitted => 'Envoyé pour validation';
+
+  @override
+  String get portalProductPendingHint => 'Il apparaît aux clients une fois validé par l\'administrateur';
+
+  @override
   String get adminInvalidName =>
       'Le nom doit contenir au moins deux caractères';
 

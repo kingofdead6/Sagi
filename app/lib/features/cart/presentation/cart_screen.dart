@@ -170,6 +170,7 @@ class _CartLineCard extends StatelessWidget {
             radius: AppRadius.medium,
             fallbackIcon: Icons.restaurant_rounded,
             transformWidth: 200,
+            aspectRatio: 1,
           ),
           Gap.wLg,
           Expanded(

@@ -181,6 +181,13 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                         image: data.image,
                         fit: BoxFit.cover,
                         fallbackIcon: Icons.restaurant_rounded,
+                        // The header is a fixed 320px band; cropping to that
+                        // shape keeps the subject centred instead of letting
+                        // a tall photo get trimmed to its top edge.
+                        transformWidth: 900,
+                        aspectRatio: 3 / 2,
+                        // The expanded app bar already fixes the band's size.
+                        applyAspectRatioToLayout: false,
                       ),
                       SafeArea(
                         child: Padding(

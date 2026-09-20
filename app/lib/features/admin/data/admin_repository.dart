@@ -158,16 +158,42 @@ class AdminRepository {
         );
 
   /// Gives a shop its own login. The owner can then manage their menu only.
-  Future<Result<void>> createVendorAccount(
+  Future<Result<VendorAccount>> createVendorAccount(
     String vendorId, {
     required String fullName,
     required String phone,
     required String password,
   }) =>
-      _client.post<void>(
+      _client.post<VendorAccount>(
         Api.adminVendorAccount(vendorId),
         body: {'fullName': fullName, 'phone': phone, 'password': password},
-        parse: (_) {},
+        parse: (data) => VendorAccount.fromJson(data as Map<String, dynamic>),
+      );
+
+  /// The shop's existing login, or null when it has none. Drives whether the
+  /// admin UI offers "create" or "edit / delete".
+  Future<Result<VendorAccount?>> vendorAccount(String vendorId) => _client.get<VendorAccount?>(
+        Api.adminVendorAccount(vendorId),
+        parse: (data) =>
+            data == null ? null : VendorAccount.fromJson(data as Map<String, dynamic>),
+      );
+
+  /// Edits an existing login. Omitted fields keep their current value; a new
+  /// password signs the shop owner out of their other sessions.
+  Future<Result<VendorAccount>> updateVendorAccount(
+    String vendorId, {
+    String? fullName,
+    String? phone,
+    String? password,
+  }) =>
+      _client.patch<VendorAccount>(
+        Api.adminVendorAccount(vendorId),
+        body: {
+          if (fullName != null && fullName.isNotEmpty) 'fullName': fullName,
+          if (phone != null && phone.isNotEmpty) 'phone': phone,
+          if (password != null && password.isNotEmpty) 'password': password,
+        },
+        parse: (data) => VendorAccount.fromJson(data as Map<String, dynamic>),
       );
 
   Future<Result<void>> revokeVendorAccount(String vendorId) =>
@@ -192,7 +218,12 @@ class AdminRepository {
   Future<Result<void>> deleteSection(String id) =>
       _client.delete<void>(Api.adminSection(id), parse: (_) {});
 
-  Future<Result<Paged<Product>>> products({String? vendorId, String? query, int page = 1}) =>
+  Future<Result<Paged<Product>>> products({
+    String? vendorId,
+    String? query,
+    ProductStatus? status,
+    int page = 1,
+  }) =>
       _client.get<Paged<Product>>(
         Api.adminProducts,
         query: {
@@ -200,6 +231,7 @@ class AdminRepository {
           'limit': 50,
           if (vendorId != null) 'vendor': vendorId,
           if (query != null && query.isNotEmpty) 'q': query,
+          if (status != null) 'status': status.name,
         },
         parse: (data) => Paged.fromJson(data, Product.fromJson),
       );
@@ -215,6 +247,21 @@ class AdminRepository {
           body: body,
           parse: (data) => Product.fromJson(data as Map<String, dynamic>),
         );
+
+  /// Approves a submitted product, publishing it to the public menu.
+  Future<Result<Product>> approveProduct(String id) => _client.patch<Product>(
+        Api.adminProductStatus(id),
+        body: const {'status': 'approved'},
+        parse: (data) => Product.fromJson(data as Map<String, dynamic>),
+      );
+
+  /// Rejects a submitted product. The reason is shown to the shop so it can
+  /// fix the product and resubmit.
+  Future<Result<Product>> rejectProduct(String id, String reason) => _client.patch<Product>(
+        Api.adminProductStatus(id),
+        body: {'status': 'rejected', 'rejectionReason': reason},
+        parse: (data) => Product.fromJson(data as Map<String, dynamic>),
+      );
 
   Future<Result<void>> deleteProduct(String id) =>
       _client.delete<void>(Api.adminProduct(id), parse: (_) {});

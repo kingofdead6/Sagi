@@ -563,7 +563,7 @@ as List<ProductOptionValue>,
 /// @nodoc
 mixin _$Product {
 
- String get id; String get name;@RefIdConverter() String? get vendor;@RefIdConverter() String? get section; String? get description; ImageRef? get image;@MoneyConverter() Money get priceCentimes; bool get isAvailable; int get sortOrder; List<ProductOption> get options;
+ String get id; String get name;@RefIdConverter() String? get vendor;@RefIdConverter() String? get section; String? get description; ImageRef? get image;@MoneyConverter() Money get priceCentimes; bool get isAvailable; int get sortOrder; List<ProductOption> get options; ProductStatus get status; String? get rejectionReason;
 /// Create a copy of Product
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -576,16 +576,16 @@ $ProductCopyWith<Product> get copyWith => _$ProductCopyWithImpl<Product>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Product&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.vendor, vendor) || other.vendor == vendor)&&(identical(other.section, section) || other.section == section)&&(identical(other.description, description) || other.description == description)&&(identical(other.image, image) || other.image == image)&&(identical(other.priceCentimes, priceCentimes) || other.priceCentimes == priceCentimes)&&(identical(other.isAvailable, isAvailable) || other.isAvailable == isAvailable)&&(identical(other.sortOrder, sortOrder) || other.sortOrder == sortOrder)&&const DeepCollectionEquality().equals(other.options, options));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Product&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.vendor, vendor) || other.vendor == vendor)&&(identical(other.section, section) || other.section == section)&&(identical(other.description, description) || other.description == description)&&(identical(other.image, image) || other.image == image)&&(identical(other.priceCentimes, priceCentimes) || other.priceCentimes == priceCentimes)&&(identical(other.isAvailable, isAvailable) || other.isAvailable == isAvailable)&&(identical(other.sortOrder, sortOrder) || other.sortOrder == sortOrder)&&const DeepCollectionEquality().equals(other.options, options)&&(identical(other.status, status) || other.status == status)&&(identical(other.rejectionReason, rejectionReason) || other.rejectionReason == rejectionReason));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,vendor,section,description,image,priceCentimes,isAvailable,sortOrder,const DeepCollectionEquality().hash(options));
+int get hashCode => Object.hash(runtimeType,id,name,vendor,section,description,image,priceCentimes,isAvailable,sortOrder,const DeepCollectionEquality().hash(options),status,rejectionReason);
 
 @override
 String toString() {
-  return 'Product(id: $id, name: $name, vendor: $vendor, section: $section, description: $description, image: $image, priceCentimes: $priceCentimes, isAvailable: $isAvailable, sortOrder: $sortOrder, options: $options)';
+  return 'Product(id: $id, name: $name, vendor: $vendor, section: $section, description: $description, image: $image, priceCentimes: $priceCentimes, isAvailable: $isAvailable, sortOrder: $sortOrder, options: $options, status: $status, rejectionReason: $rejectionReason)';
 }
 
 
@@ -596,7 +596,7 @@ abstract mixin class $ProductCopyWith<$Res>  {
   factory $ProductCopyWith(Product value, $Res Function(Product) _then) = _$ProductCopyWithImpl;
 @useResult
 $Res call({
- String id, String name,@RefIdConverter() String? vendor,@RefIdConverter() String? section, String? description, ImageRef? image,@MoneyConverter() Money priceCentimes, bool isAvailable, int sortOrder, List<ProductOption> options
+ String id, String name,@RefIdConverter() String? vendor,@RefIdConverter() String? section, String? description, ImageRef? image,@MoneyConverter() Money priceCentimes, bool isAvailable, int sortOrder, List<ProductOption> options, ProductStatus status, String? rejectionReason
 });
 
 
@@ -613,7 +613,7 @@ class _$ProductCopyWithImpl<$Res>
 
 /// Create a copy of Product
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? vendor = freezed,Object? section = freezed,Object? description = freezed,Object? image = freezed,Object? priceCentimes = null,Object? isAvailable = null,Object? sortOrder = null,Object? options = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? vendor = freezed,Object? section = freezed,Object? description = freezed,Object? image = freezed,Object? priceCentimes = null,Object? isAvailable = null,Object? sortOrder = null,Object? options = null,Object? status = null,Object? rejectionReason = freezed,}) {
   return _then(Product(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -625,7 +625,9 @@ as ImageRef?,priceCentimes: null == priceCentimes ? _self.priceCentimes : priceC
 as Money,isAvailable: null == isAvailable ? _self.isAvailable : isAvailable // ignore: cast_nullable_to_non_nullable
 as bool,sortOrder: null == sortOrder ? _self.sortOrder : sortOrder // ignore: cast_nullable_to_non_nullable
 as int,options: null == options ? _self.options : options // ignore: cast_nullable_to_non_nullable
-as List<ProductOption>,
+as List<ProductOption>,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as ProductStatus,rejectionReason: freezed == rejectionReason ? _self.rejectionReason : rejectionReason // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 /// Create a copy of Product
@@ -722,10 +724,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name, @RefIdConverter()  String? vendor, @RefIdConverter()  String? section,  String? description,  ImageRef? image, @MoneyConverter()  Money priceCentimes,  bool isAvailable,  int sortOrder,  List<ProductOption> options)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name, @RefIdConverter()  String? vendor, @RefIdConverter()  String? section,  String? description,  ImageRef? image, @MoneyConverter()  Money priceCentimes,  bool isAvailable,  int sortOrder,  List<ProductOption> options,  ProductStatus status,  String? rejectionReason)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Product() when $default != null:
-return $default(_that.id,_that.name,_that.vendor,_that.section,_that.description,_that.image,_that.priceCentimes,_that.isAvailable,_that.sortOrder,_that.options);case _:
+return $default(_that.id,_that.name,_that.vendor,_that.section,_that.description,_that.image,_that.priceCentimes,_that.isAvailable,_that.sortOrder,_that.options,_that.status,_that.rejectionReason);case _:
   return orElse();
 
 }
@@ -743,10 +745,10 @@ return $default(_that.id,_that.name,_that.vendor,_that.section,_that.description
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name, @RefIdConverter()  String? vendor, @RefIdConverter()  String? section,  String? description,  ImageRef? image, @MoneyConverter()  Money priceCentimes,  bool isAvailable,  int sortOrder,  List<ProductOption> options)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name, @RefIdConverter()  String? vendor, @RefIdConverter()  String? section,  String? description,  ImageRef? image, @MoneyConverter()  Money priceCentimes,  bool isAvailable,  int sortOrder,  List<ProductOption> options,  ProductStatus status,  String? rejectionReason)  $default,) {final _that = this;
 switch (_that) {
 case _Product():
-return $default(_that.id,_that.name,_that.vendor,_that.section,_that.description,_that.image,_that.priceCentimes,_that.isAvailable,_that.sortOrder,_that.options);case _:
+return $default(_that.id,_that.name,_that.vendor,_that.section,_that.description,_that.image,_that.priceCentimes,_that.isAvailable,_that.sortOrder,_that.options,_that.status,_that.rejectionReason);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -763,10 +765,10 @@ return $default(_that.id,_that.name,_that.vendor,_that.section,_that.description
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name, @RefIdConverter()  String? vendor, @RefIdConverter()  String? section,  String? description,  ImageRef? image, @MoneyConverter()  Money priceCentimes,  bool isAvailable,  int sortOrder,  List<ProductOption> options)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name, @RefIdConverter()  String? vendor, @RefIdConverter()  String? section,  String? description,  ImageRef? image, @MoneyConverter()  Money priceCentimes,  bool isAvailable,  int sortOrder,  List<ProductOption> options,  ProductStatus status,  String? rejectionReason)?  $default,) {final _that = this;
 switch (_that) {
 case _Product() when $default != null:
-return $default(_that.id,_that.name,_that.vendor,_that.section,_that.description,_that.image,_that.priceCentimes,_that.isAvailable,_that.sortOrder,_that.options);case _:
+return $default(_that.id,_that.name,_that.vendor,_that.section,_that.description,_that.image,_that.priceCentimes,_that.isAvailable,_that.sortOrder,_that.options,_that.status,_that.rejectionReason);case _:
   return null;
 
 }
@@ -778,7 +780,7 @@ return $default(_that.id,_that.name,_that.vendor,_that.section,_that.description
 @JsonSerializable()
 
 class _Product extends Product {
-  const _Product({required this.id, required this.name, @RefIdConverter() this.vendor, @RefIdConverter() this.section, this.description, this.image, @MoneyConverter() this.priceCentimes = const Money.zero(), this.isAvailable = true, this.sortOrder = 0,  List<ProductOption> options = const <ProductOption>[]}): _options = options,super._();
+  const _Product({required this.id, required this.name, @RefIdConverter() this.vendor, @RefIdConverter() this.section, this.description, this.image, @MoneyConverter() this.priceCentimes = const Money.zero(), this.isAvailable = true, this.sortOrder = 0,  List<ProductOption> options = const <ProductOption>[], this.status = ProductStatus.approved, this.rejectionReason}): _options = options,super._();
   factory _Product.fromJson(Map<String, dynamic> json) => _$ProductFromJson(json);
 
 @override final  String id;
@@ -797,6 +799,8 @@ class _Product extends Product {
   return EqualUnmodifiableListView(_options);
 }
 
+@override@JsonKey() final  ProductStatus status;
+@override final  String? rejectionReason;
 
 /// Create a copy of Product
 /// with the given fields replaced by the non-null parameter values.
@@ -811,16 +815,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Product&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.vendor, vendor) || other.vendor == vendor)&&(identical(other.section, section) || other.section == section)&&(identical(other.description, description) || other.description == description)&&(identical(other.image, image) || other.image == image)&&(identical(other.priceCentimes, priceCentimes) || other.priceCentimes == priceCentimes)&&(identical(other.isAvailable, isAvailable) || other.isAvailable == isAvailable)&&(identical(other.sortOrder, sortOrder) || other.sortOrder == sortOrder)&&const DeepCollectionEquality().equals(other._options, _options));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Product&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.vendor, vendor) || other.vendor == vendor)&&(identical(other.section, section) || other.section == section)&&(identical(other.description, description) || other.description == description)&&(identical(other.image, image) || other.image == image)&&(identical(other.priceCentimes, priceCentimes) || other.priceCentimes == priceCentimes)&&(identical(other.isAvailable, isAvailable) || other.isAvailable == isAvailable)&&(identical(other.sortOrder, sortOrder) || other.sortOrder == sortOrder)&&const DeepCollectionEquality().equals(other._options, _options)&&(identical(other.status, status) || other.status == status)&&(identical(other.rejectionReason, rejectionReason) || other.rejectionReason == rejectionReason));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,vendor,section,description,image,priceCentimes,isAvailable,sortOrder,const DeepCollectionEquality().hash(_options));
+int get hashCode => Object.hash(runtimeType,id,name,vendor,section,description,image,priceCentimes,isAvailable,sortOrder,const DeepCollectionEquality().hash(_options),status,rejectionReason);
 
 @override
 String toString() {
-  return 'Product(id: $id, name: $name, vendor: $vendor, section: $section, description: $description, image: $image, priceCentimes: $priceCentimes, isAvailable: $isAvailable, sortOrder: $sortOrder, options: $options)';
+  return 'Product(id: $id, name: $name, vendor: $vendor, section: $section, description: $description, image: $image, priceCentimes: $priceCentimes, isAvailable: $isAvailable, sortOrder: $sortOrder, options: $options, status: $status, rejectionReason: $rejectionReason)';
 }
 
 
@@ -831,7 +835,7 @@ abstract mixin class _$ProductCopyWith<$Res> implements $ProductCopyWith<$Res> {
   factory _$ProductCopyWith(_Product value, $Res Function(_Product) _then) = __$ProductCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name,@RefIdConverter() String? vendor,@RefIdConverter() String? section, String? description, ImageRef? image,@MoneyConverter() Money priceCentimes, bool isAvailable, int sortOrder, List<ProductOption> options
+ String id, String name,@RefIdConverter() String? vendor,@RefIdConverter() String? section, String? description, ImageRef? image,@MoneyConverter() Money priceCentimes, bool isAvailable, int sortOrder, List<ProductOption> options, ProductStatus status, String? rejectionReason
 });
 
 
@@ -848,7 +852,7 @@ class __$ProductCopyWithImpl<$Res>
 
 /// Create a copy of Product
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? vendor = freezed,Object? section = freezed,Object? description = freezed,Object? image = freezed,Object? priceCentimes = null,Object? isAvailable = null,Object? sortOrder = null,Object? options = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? vendor = freezed,Object? section = freezed,Object? description = freezed,Object? image = freezed,Object? priceCentimes = null,Object? isAvailable = null,Object? sortOrder = null,Object? options = null,Object? status = null,Object? rejectionReason = freezed,}) {
   return _then(_Product(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -860,7 +864,9 @@ as ImageRef?,priceCentimes: null == priceCentimes ? _self.priceCentimes : priceC
 as Money,isAvailable: null == isAvailable ? _self.isAvailable : isAvailable // ignore: cast_nullable_to_non_nullable
 as bool,sortOrder: null == sortOrder ? _self.sortOrder : sortOrder // ignore: cast_nullable_to_non_nullable
 as int,options: null == options ? _self._options : options // ignore: cast_nullable_to_non_nullable
-as List<ProductOption>,
+as List<ProductOption>,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as ProductStatus,rejectionReason: freezed == rejectionReason ? _self.rejectionReason : rejectionReason // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

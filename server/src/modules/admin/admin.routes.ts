@@ -13,6 +13,7 @@ import * as analytics from './admin.service';
 import * as orderService from '../orders/order.service';
 import * as agentService from '../agents/agent.service';
 import { hashPassword } from '../auth/auth.service';
+import { revokeAllForUser } from '../auth/token.service';
 
 import { Order } from '../orders/order.model';
 import { Category } from '../categories/category.model';
@@ -30,6 +31,7 @@ import {
   adminOrdersQuerySchema,
   adminStatusSchema,
   createVendorAccountSchema,
+  updateVendorAccountSchema,
   assignSchema,
   availableAgentsQuerySchema,
   bulkAvailabilitySchema,
@@ -45,6 +47,7 @@ import {
   updateCustomerSchema,
   updateOfferSchema,
   updateProductSchema,
+  productStatusSchema,
   updateSettingsSchema,
   updateVoucherSchema,
 } from './admin.schema';
@@ -359,6 +362,62 @@ adminRouter.post(
   }),
 );
 
+/**
+ * Read a shop's login, so the admin UI can offer edit/delete instead of
+ * "create" when one already exists. Returns null when the shop has none.
+ */
+adminRouter.get(
+  '/vendors/:id/account',
+  validate({ params: idParams }),
+  asyncHandler(async (req, res) => {
+    const vendor = await Vendor.findById(req.params.id);
+    if (!vendor) throw ApiError.notFound('المتجر غير موجود');
+    if (!vendor.owner) return ok(res, null);
+
+    const user = await User.findById(vendor.owner).select('fullName phone role createdAt');
+    // A dangling owner pointer (user deleted out from under the vendor) reads
+    // as "no account" rather than erroring, so the admin can create a fresh one.
+    if (!user) return ok(res, null);
+    return ok(res, { ...user.toJSON(), vendor: vendor._id });
+  }),
+);
+
+/**
+ * Edit a shop's login: rename, change the phone, or set a new password.
+ * Omitted fields are left as they are.
+ */
+adminRouter.patch(
+  '/vendors/:id/account',
+  validate({ params: idParams, body: updateVendorAccountSchema }),
+  asyncHandler(async (req, res) => {
+    const vendor = await Vendor.findById(req.params.id);
+    if (!vendor) throw ApiError.notFound('المتجر غير موجود');
+    if (!vendor.owner) throw ApiError.notFound('لا يوجد حساب لهذا المتجر');
+
+    const user = await User.findById(vendor.owner);
+    if (!user) throw ApiError.notFound('لا يوجد حساب لهذا المتجر');
+
+    // A phone is one account's identity — refuse one that is already taken by
+    // somebody else, exactly as account creation does.
+    if (req.body.phone && req.body.phone !== user.phone) {
+      const taken = await User.findOne({ phone: req.body.phone, _id: { $ne: user._id } });
+      if (taken) throw ApiError.conflict('رقم الهاتف مسجّل من قبل');
+      user.phone = req.body.phone;
+    }
+
+    if (req.body.fullName) user.fullName = req.body.fullName;
+    if (req.body.password) user.passwordHash = await hashPassword(req.body.password);
+
+    await user.save();
+
+    // A new password ends the old sessions, matching self-service password
+    // change — the shop owner signs in again with the credentials they were
+    // given. A rename or phone change leaves the session alone.
+    if (req.body.password) await revokeAllForUser(String(user._id));
+    return ok(res, { ...user.toJSON(), vendor: vendor._id }, 'تم تحديث حساب المتجر');
+  }),
+);
+
 /** Revoke a shop's login. The shop itself and its menu are untouched. */
 adminRouter.delete(
   '/vendors/:id/account',
@@ -421,32 +480,97 @@ adminRouter.delete(
 adminRouter.get(
   '/products',
   validate({
-    query: listUsersQuerySchema.extend({ vendor: objectId.optional(), section: objectId.optional() }),
+    query: listUsersQuerySchema.extend({
+      vendor: objectId.optional(),
+      section: objectId.optional(),
+      status: z.enum(['pending', 'approved', 'rejected']).optional(),
+    }),
   }),
   asyncHandler(async (req, res) => {
-    const { q, page, limit, vendor, section } = req.query as unknown as {
+    const { q, page, limit, vendor, section, status } = req.query as unknown as {
       q?: string;
       page: number;
       limit: number;
       vendor?: string;
       section?: string;
+      status?: string;
     };
     const filter: Record<string, unknown> = {};
     if (vendor) filter.vendor = vendor;
     if (section) filter.section = section;
+    if (status) filter.status = status;
     if (q) filter.name = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
     const [docs, total] = await Promise.all([
-      Product.find(filter).sort({ sortOrder: 1, name: 1 }).skip(skipFor(page, limit)).limit(limit),
+      // Pending items first so the review queue surfaces without a filter,
+      // then oldest submission first — the longest wait gets seen soonest.
+      // A plain sort on `status` would order it alphabetically (approved,
+      // pending, rejected), so the rank is computed rather than sorted on.
+      Product.aggregate([
+        { $match: filter },
+        {
+          $addFields: {
+            _reviewRank: {
+              $switch: {
+                branches: [
+                  { case: { $eq: ['$status', 'pending'] }, then: 0 },
+                  { case: { $eq: ['$status', 'rejected'] }, then: 1 },
+                ],
+                default: 2,
+              },
+            },
+          },
+        },
+        { $sort: { _reviewRank: 1, submittedAt: 1, sortOrder: 1, name: 1 } },
+        { $skip: skipFor(page, limit) },
+        { $limit: limit },
+        {
+          $lookup: {
+            from: 'vendors',
+            localField: 'vendor',
+            foreignField: '_id',
+            as: 'vendor',
+            pipeline: [{ $project: { name: 1, slug: 1, logo: 1 } }],
+          },
+        },
+        { $unwind: { path: '$vendor', preserveNullAndEmptyArrays: true } },
+        { $project: { _reviewRank: 0 } },
+      ]),
       Product.countDocuments(filter),
     ]);
-    return ok(res, buildPage(docs.map((d) => d.toJSON()), page, limit, total));
+    // Aggregate output is plain objects, so the schema's _id -> id transform
+    // never runs; map it here to keep the shape identical to every other
+    // product the API returns.
+    const items = docs.map((doc) => {
+      const { _id, __v, vendor, ...rest } = doc as Record<string, any>;
+      return {
+        ...rest,
+        id: String(_id),
+        vendor: vendor ? { ...vendor, id: String(vendor._id), _id: undefined } : vendor,
+      };
+    });
+    return ok(res, buildPage(items, page, limit, total));
   }),
 );
 
 adminRouter.post(
   '/products',
   validate({ body: createProductSchema }),
-  asyncHandler(async (req, res) => created(res, (await Product.create(req.body)).toJSON(), 'تمت إضافة المنتج')),
+  asyncHandler(async (req, res) =>
+    created(
+      res,
+      // The admin is the reviewer, so anything they create is already cleared.
+      (
+        await Product.create({
+          ...req.body,
+          status: 'approved',
+          rejectionReason: null,
+          reviewedBy: req.user!.sub,
+          reviewedAt: new Date(),
+        })
+      ).toJSON(),
+      'تمت إضافة المنتج',
+    ),
+  ),
 );
 
 adminRouter.patch(
@@ -459,8 +583,55 @@ adminRouter.patch(
     if (nextImage !== undefined && existing.image?.publicId && existing.image.publicId !== nextImage?.publicId) {
       await destroyImage(existing.image.publicId);
     }
-    const doc = await Product.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true });
-    return ok(res, doc!.toJSON(), 'تم تحديث المنتج');
+    // An admin editing a product is also approving it — that is the
+    // "admin can edit those products and submit them" step.
+    const doc = await Product.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: {
+          ...req.body,
+          status: 'approved',
+          rejectionReason: null,
+          reviewedBy: req.user!.sub,
+          reviewedAt: new Date(),
+        },
+      },
+      { new: true },
+    );
+    return ok(res, doc!.toJSON(), 'تم تحديث المنتج ونشره');
+  }),
+);
+
+/**
+ * Approve or reject a submitted product.
+ *
+ * Approving publishes it to the public menu; rejecting keeps it hidden and
+ * hands the shop a reason it can act on.
+ */
+adminRouter.patch(
+  '/products/:id/status',
+  validate({ params: idParams, body: productStatusSchema }),
+  asyncHandler(async (req, res) => {
+    const doc = await Product.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: {
+          status: req.body.status,
+          rejectionReason: req.body.status === 'rejected' ? req.body.rejectionReason : null,
+          reviewedBy: req.user!.sub,
+          reviewedAt: new Date(),
+        },
+      },
+      { new: true },
+    );
+    if (!doc) throw ApiError.notFound('المنتج غير موجود');
+    const message =
+      req.body.status === 'approved'
+        ? 'تمت الموافقة على المنتج'
+        : req.body.status === 'rejected'
+          ? 'تم رفض المنتج'
+          : 'تم تحديث حالة المنتج';
+    return ok(res, doc.toJSON(), message);
   }),
 );
 

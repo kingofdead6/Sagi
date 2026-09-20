@@ -153,6 +153,22 @@ Map<String, dynamic> _$VoucherToJson(_Voucher instance) => <String, dynamic>{
   'isActive': instance.isActive,
 };
 
+_VendorAccount _$VendorAccountFromJson(Map<String, dynamic> json) =>
+    _VendorAccount(
+      id: json['id'] as String,
+      fullName: json['fullName'] as String? ?? '',
+      phone: json['phone'] as String? ?? '',
+      createdAt: const NullableDateConverter().fromJson(json['createdAt']),
+    );
+
+Map<String, dynamic> _$VendorAccountToJson(_VendorAccount instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'fullName': instance.fullName,
+      'phone': instance.phone,
+      'createdAt': const NullableDateConverter().toJson(instance.createdAt),
+    };
+
 _ManagedUser _$ManagedUserFromJson(Map<String, dynamic> json) => _ManagedUser(
   id: json['id'] as String,
   fullName: json['fullName'] as String? ?? '',

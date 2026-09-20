@@ -1352,6 +1352,63 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adminVendorAccountRevoke => 'حذف الحساب';
 
   @override
+  String get adminVendorAccountEdit => 'تعديل الحساب';
+
+  @override
+  String get adminVendorAccountNewPassword => 'كلمة مرور جديدة (اتركها فارغة للإبقاء عليها)';
+
+  @override
+  String get adminVendorAccountCreated => 'تم إنشاء حساب الدخول';
+
+  @override
+  String get adminVendorAccountUpdated => 'تم تحديث الحساب';
+
+  @override
+  String get adminVendorAccountRevoked => 'تم حذف الحساب';
+
+  @override
+  String get adminProductStatusPending => 'في انتظار المراجعة';
+
+  @override
+  String get adminProductStatusApproved => 'منشور';
+
+  @override
+  String get adminProductStatusRejected => 'مرفوض';
+
+  @override
+  String get adminProductApprove => 'موافقة';
+
+  @override
+  String get adminProductReject => 'رفض';
+
+  @override
+  String get adminProductRejectReason => 'سبب الرفض';
+
+  @override
+  String get adminProductApproved => 'تم نشر المنتج';
+
+  @override
+  String get adminProductRejected => 'تم رفض المنتج';
+
+  @override
+  String get adminProductsPendingFilter => 'في انتظار المراجعة';
+
+  @override
+  String get adminProductsAllFilter => 'كل المنتجات';
+
+  @override
+  String get portalProductPending => 'في انتظار مراجعة الإدارة';
+
+  @override
+  String get portalProductRejected => 'مرفوض';
+
+  @override
+  String get portalProductSubmitted => 'تم الإرسال للمراجعة';
+
+  @override
+  String get portalProductPendingHint => 'يظهر للزبائن بعد موافقة الإدارة';
+
+  @override
   String get adminInvalidName => 'الاسم يجب أن يكون حرفين على الأقل';
 
   @override

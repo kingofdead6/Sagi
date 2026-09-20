@@ -139,7 +139,9 @@ export async function getMenu(vendorId: string) {
 
   const [sections, products] = await Promise.all([
     MenuSection.find({ vendor: vendorId }).sort({ sortOrder: 1 }),
-    Product.find({ vendor: vendorId }).sort({ sortOrder: 1, name: 1 }),
+    // Only approved products reach the public menu; pending and rejected
+    // ones stay visible to the shop in its portal and to the admin queue.
+    Product.find({ vendor: vendorId, status: 'approved' }).sort({ sortOrder: 1, name: 1 }),
   ]);
 
   const grouped = sections.map((section) => ({

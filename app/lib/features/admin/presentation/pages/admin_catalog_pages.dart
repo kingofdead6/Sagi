@@ -5,15 +5,15 @@ import 'package:saji/app/theme/text_styles.dart';
 import 'package:saji/app/theme/tokens.dart';
 import 'package:saji/core/failures.dart';
 import 'package:saji/core/l10n_ext.dart';
-import 'package:saji/core/models/page.dart';
 import 'package:saji/core/models/image_ref.dart';
+import 'package:saji/core/models/page.dart';
 import 'package:saji/core/money.dart';
 import 'package:saji/core/network/image_upload_service.dart';
 import 'package:saji/core/result.dart';
-import 'package:saji/core/widgets/text_input_dialog.dart';
 import 'package:saji/core/widgets/empty_state.dart';
 import 'package:saji/core/widgets/error_retry.dart';
 import 'package:saji/core/widgets/price_text.dart';
+import 'package:saji/core/widgets/text_input_dialog.dart';
 import 'package:saji/features/admin/domain/admin_models.dart';
 import 'package:saji/features/admin/presentation/admin_controller.dart';
 import 'package:saji/features/admin/presentation/admin_image_field.dart';
@@ -134,9 +134,15 @@ final adminSectionsProvider =
   };
 });
 
+/// Which review state the product list is filtered to. Null shows everything,
+/// with pending items sorted to the top by the server.
+final adminProductStatusProvider = StateProvider<ProductStatus?>((ref) => null);
+
 final adminProductsProvider = FutureProvider.autoDispose<Paged<Product>>((ref) async {
   final vendorId = ref.watch(adminProductVendorProvider);
-  final result = await ref.watch(adminRepositoryProvider).products(vendorId: vendorId);
+  final status = ref.watch(adminProductStatusProvider);
+  final result =
+      await ref.watch(adminRepositoryProvider).products(vendorId: vendorId, status: status);
   return switch (result) {
     Ok(:final value) => value,
     Err(:final failure) => throw failure,
@@ -156,6 +162,7 @@ class AdminProductsPage extends ConsumerWidget {
     final products = ref.watch(adminProductsProvider);
     final vendors = ref.watch(adminVendorsProvider).valueOrNull;
     final vendorId = ref.watch(adminProductVendorProvider);
+    final status = ref.watch(adminProductStatusProvider);
     final isWide = MediaQuery.sizeOf(context).width >= _sidePanelBreakpoint;
 
     return Scaffold(
@@ -175,8 +182,11 @@ class AdminProductsPage extends ConsumerWidget {
                     isWide: isWide,
                     vendorId: vendorId,
                     vendors: vendors?.items ?? const <Vendor>[],
+                    status: status,
                     onVendorChanged: (value) =>
                         ref.read(adminProductVendorProvider.notifier).state = value,
+                    onStatusChanged: (value) =>
+                        ref.read(adminProductStatusProvider.notifier).state = value,
                     onNewProduct: () => _editProduct(context, ref, null, vendorId),
                   ),
                 ),
@@ -313,16 +323,58 @@ class _ProductListState extends ConsumerState<_ProductList> {
                           ),
                         )
                       : const Icon(Icons.inventory_2_outlined, color: AppColors.textMuted),
-                  title: Text(product.name, style: AppText.adminTable),
+                  title: Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          product.name,
+                          style: AppText.adminTable,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      // Anything not yet approved is flagged right in the row,
+                      // so the queue is obvious without switching the filter.
+                      if (!product.isApproved) ...[
+                        Gap.wSm,
+                        _ProductStatusBadge(status: product.status),
+                      ],
+                    ],
+                  ),
                   subtitle: Text(
-                    product.options.isEmpty
-                        ? ''
-                        : '${product.options.length} ${l10n.adminProductOptions}',
+                    [
+                      if (product.options.isNotEmpty)
+                        '${product.options.length} ${l10n.adminProductOptions}',
+                      if (product.isRejected && (product.rejectionReason?.isNotEmpty ?? false))
+                        product.rejectionReason!,
+                    ].join(' · '),
                     style: AppText.adminNav.copyWith(color: AppColors.textMuted),
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      // A pending product gets a one-tap approve and a reject
+                      // beside it; an approved one just needs its price.
+                      if (!product.isApproved) ...[
+                        IconButton(
+                          tooltip: l10n.adminProductApprove,
+                          icon: const Icon(
+                            Icons.check_circle_outline_rounded,
+                            color: AppColors.primaryGreen,
+                          ),
+                          onPressed: () => _reviewProduct(context, ref, product, approve: true),
+                        ),
+                        if (!product.isRejected)
+                          IconButton(
+                            tooltip: l10n.adminProductReject,
+                            icon: const Icon(
+                              Icons.cancel_outlined,
+                              color: AppColors.danger,
+                            ),
+                            onPressed: () => _reviewProduct(context, ref, product, approve: false),
+                          ),
+                        Gap.wSm,
+                      ],
                       PriceText(product.priceCentimes, style: AppText.adminTable),
                       Gap.wLg,
                       _AvailabilityToggle(product: product),
@@ -338,6 +390,85 @@ class _ProductListState extends ConsumerState<_ProductList> {
   }
 }
 
+/// Approves a submitted product, or rejects it with a reason the shop will see.
+/// Approving is what actually publishes it to the public menu.
+Future<void> _reviewProduct(
+  BuildContext context,
+  WidgetRef ref,
+  Product product, {
+  required bool approve,
+}) async {
+  final l10n = context.l10n;
+  final messenger = ScaffoldMessenger.of(context);
+  // Captured up front: the dialog and the request are both async gaps, after
+  // which reaching back into this context is not safe.
+  final describeFailure = context.failureMessage;
+
+  String? reason;
+  if (!approve) {
+    // The server requires a reason on a rejection, so collect it up front
+    // rather than round-tripping into a validation error.
+    final values = await showTextInputDialog(
+      context: context,
+      title: l10n.adminProductReject,
+      titleStyle: AppText.adminSubheading,
+      width: 360,
+      fields: [
+        TextInputSpec(name: 'reason', label: l10n.adminProductRejectReason, autofocus: true),
+      ],
+    );
+    reason = values?['reason']?.trim();
+    if (reason == null || reason.isEmpty) return;
+  }
+
+  final repository = ref.read(adminRepositoryProvider);
+  final result = approve
+      ? await repository.approveProduct(product.id)
+      : await repository.rejectProduct(product.id, reason!);
+
+  switch (result) {
+    case Ok():
+      ref.invalidate(adminProductsProvider);
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(approve ? l10n.adminProductApproved : l10n.adminProductRejected),
+          ),
+        );
+    case Err(:final failure):
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(describeFailure(failure))));
+  }
+}
+
+/// A small coloured chip naming where a product sits in the review pipeline.
+class _ProductStatusBadge extends StatelessWidget {
+  const _ProductStatusBadge({required this.status});
+
+  final ProductStatus status;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final (label, color) = switch (status) {
+      ProductStatus.pending => (l10n.adminProductStatusPending, AppColors.warning),
+      ProductStatus.approved => (l10n.adminProductStatusApproved, AppColors.primaryGreen),
+      ProductStatus.rejected => (l10n.adminProductStatusRejected, AppColors.danger),
+    };
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppRadius.small),
+      ),
+      child: Text(label, style: AppText.badge.copyWith(color: color)),
+    );
+  }
+}
+
 /// Menu sections for the selected vendor: create, delete, and see how the menu
 /// is grouped on the customer side.
 /// The products toolbar. On a wide window the vendor filter and the new-product
@@ -348,14 +479,18 @@ class _ProductsToolbar extends StatelessWidget {
     required this.isWide,
     required this.vendorId,
     required this.vendors,
+    required this.status,
     required this.onVendorChanged,
+    required this.onStatusChanged,
     required this.onNewProduct,
   });
 
   final bool isWide;
   final String? vendorId;
   final List<Vendor> vendors;
+  final ProductStatus? status;
   final ValueChanged<String?> onVendorChanged;
+  final ValueChanged<ProductStatus?> onStatusChanged;
   final VoidCallback onNewProduct;
 
   @override
@@ -375,6 +510,30 @@ class _ProductsToolbar extends StatelessWidget {
       onChanged: onVendorChanged,
     );
 
+    // Lets the admin jump straight to the review queue.
+    final statusFilter = DropdownButtonFormField<ProductStatus?>(
+      initialValue: status,
+      isExpanded: true,
+      style: AppText.adminTable,
+      decoration: InputDecoration(labelText: l10n.adminProductsAllFilter),
+      items: [
+        DropdownMenuItem(value: null, child: Text(l10n.adminProductsAllFilter)),
+        DropdownMenuItem(
+          value: ProductStatus.pending,
+          child: Text(l10n.adminProductsPendingFilter),
+        ),
+        DropdownMenuItem(
+          value: ProductStatus.approved,
+          child: Text(l10n.adminProductStatusApproved),
+        ),
+        DropdownMenuItem(
+          value: ProductStatus.rejected,
+          child: Text(l10n.adminProductStatusRejected),
+        ),
+      ],
+      onChanged: onStatusChanged,
+    );
+
     final addButton = FilledButton.icon(
       onPressed: onNewProduct,
       icon: const Icon(Icons.add_rounded, size: 18),
@@ -385,6 +544,8 @@ class _ProductsToolbar extends StatelessWidget {
       return Row(
         children: [
           SizedBox(width: 260, child: filter),
+          Gap.wMd,
+          SizedBox(width: 220, child: statusFilter),
           const Spacer(),
           addButton,
         ],
@@ -394,6 +555,8 @@ class _ProductsToolbar extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        statusFilter,
+        Gap.sm,
         Row(
           children: [
             Expanded(child: filter),

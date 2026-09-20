@@ -12,7 +12,7 @@ productRouter.get(
   '/:id',
   validate({ params: idParams }),
   asyncHandler(async (req, res) => {
-    const product = await Product.findById(req.params.id).populate({
+    const product = await Product.findOne({ _id: req.params.id, status: 'approved' }).populate({
       path: 'vendor',
       select: 'name slug logo isOpen deliveryFeeCentimes prepTimeMin prepTimeMax',
     });

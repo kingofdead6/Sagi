@@ -129,6 +129,21 @@ abstract class Voucher with _$Voucher {
   factory Voucher.fromJson(Map<String, dynamic> json) => _$VoucherFromJson(json);
 }
 
+/// The login attached to a shop, as returned by `GET /admin/vendors/:id/account`.
+/// Its absence (a null response) is what tells the UI to offer "create" instead
+/// of "edit / delete".
+@freezed
+abstract class VendorAccount with _$VendorAccount {
+  const factory VendorAccount({
+    required String id,
+    @Default('') String fullName,
+    @Default('') String phone,
+    @NullableDateConverter() DateTime? createdAt,
+  }) = _VendorAccount;
+
+  factory VendorAccount.fromJson(Map<String, dynamic> json) => _$VendorAccountFromJson(json);
+}
+
 @freezed
 abstract class ManagedUser with _$ManagedUser {
   const factory ManagedUser({

@@ -1360,6 +1360,63 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminVendorAccountRevoke => 'Delete the account';
 
   @override
+  String get adminVendorAccountEdit => 'Edit the account';
+
+  @override
+  String get adminVendorAccountNewPassword => 'New password (leave blank to keep)';
+
+  @override
+  String get adminVendorAccountCreated => 'Login created';
+
+  @override
+  String get adminVendorAccountUpdated => 'Account updated';
+
+  @override
+  String get adminVendorAccountRevoked => 'Account deleted';
+
+  @override
+  String get adminProductStatusPending => 'Awaiting review';
+
+  @override
+  String get adminProductStatusApproved => 'Published';
+
+  @override
+  String get adminProductStatusRejected => 'Rejected';
+
+  @override
+  String get adminProductApprove => 'Approve';
+
+  @override
+  String get adminProductReject => 'Reject';
+
+  @override
+  String get adminProductRejectReason => 'Reason for rejection';
+
+  @override
+  String get adminProductApproved => 'Product published';
+
+  @override
+  String get adminProductRejected => 'Product rejected';
+
+  @override
+  String get adminProductsPendingFilter => 'Awaiting review';
+
+  @override
+  String get adminProductsAllFilter => 'All products';
+
+  @override
+  String get portalProductPending => 'Awaiting admin review';
+
+  @override
+  String get portalProductRejected => 'Rejected';
+
+  @override
+  String get portalProductSubmitted => 'Sent for review';
+
+  @override
+  String get portalProductPendingHint => 'It appears to customers once an admin approves it';
+
+  @override
   String get adminInvalidName => 'The name must be at least two characters';
 
   @override

@@ -15,6 +15,17 @@ enum ProductOptionType {
   bool get isSingle => this == ProductOptionType.single;
 }
 
+/// Where a product sits in the admin review pipeline. Only `approved`
+/// products are ever served from the public menu endpoints.
+enum ProductStatus {
+  @JsonValue('pending')
+  pending,
+  @JsonValue('approved')
+  approved,
+  @JsonValue('rejected')
+  rejected;
+}
+
 @freezed
 abstract class ProductOptionValue with _$ProductOptionValue {
   const factory ProductOptionValue({
@@ -52,6 +63,10 @@ abstract class Product with _$Product {
     @Default(true) bool isAvailable,
     @Default(0) int sortOrder,
     @Default(<ProductOption>[]) List<ProductOption> options,
+    // Products fetched from public endpoints are always approved; the portal
+    // and admin queue are where the other statuses show up.
+    @Default(ProductStatus.approved) ProductStatus status,
+    String? rejectionReason,
   }) = _Product;
 
   const Product._();
@@ -61,6 +76,12 @@ abstract class Product with _$Product {
   bool get hasOptions => options.isNotEmpty;
 
   bool get hasRequiredOptions => options.any((o) => o.isRequired);
+
+  bool get isPending => status == ProductStatus.pending;
+
+  bool get isApproved => status == ProductStatus.approved;
+
+  bool get isRejected => status == ProductStatus.rejected;
 }
 
 /// One `{section, products}` group from `GET /vendors/:id/menu`.

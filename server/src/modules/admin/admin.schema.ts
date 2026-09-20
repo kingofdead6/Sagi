@@ -72,6 +72,26 @@ export const createProductSchema = z
 
 export const updateProductSchema = createProductSchema.partial().omit({ vendor: true });
 
+/** Admin review decisions on a submitted product. */
+export const productStatusSchema = z
+  .object({
+    status: z.enum(['pending', 'approved', 'rejected']),
+    rejectionReason: z.string().trim().max(400).optional(),
+  })
+  .strict()
+  .refine((v) => v.status !== 'rejected' || !!v.rejectionReason, {
+    message: 'سبب الرفض مطلوب',
+    path: ['rejectionReason'],
+  });
+
+/** Filter for the admin product list, including the review queue. */
+export const adminProductsQuerySchema = z.object({
+  vendor: objectId.optional(),
+  status: z.enum(['pending', 'approved', 'rejected']).optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+});
+
 export const reorderSchema = z.object({
   items: z.array(z.object({ id: objectId, sortOrder: z.number().int() })).min(1).max(200),
 });
@@ -135,6 +155,19 @@ export const createVendorAccountSchema = z
     password: passwordField,
   })
   .strict();
+
+/**
+ * Edit an existing shop login. Every field is optional — the admin changes
+ * only what they need, and omitting the password leaves it untouched.
+ */
+export const updateVendorAccountSchema = z
+  .object({
+    fullName: z.string().trim().min(2).max(80).optional(),
+    phone: phoneField.optional(),
+    password: passwordField.optional(),
+  })
+  .strict()
+  .refine((v) => Object.keys(v).length > 0, { message: 'لا يوجد ما يتم تحديثه' });
 
 export const updateAgentSchema = z
   .object({

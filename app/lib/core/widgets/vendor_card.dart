@@ -49,6 +49,12 @@ class VendorCard extends StatelessWidget {
                     image: vendor.cover ?? vendor.logo,
                     height: AppSizes.cardImageHeight,
                     width: double.infinity,
+                    // Shop banners arrive in every shape — a logo, a wide
+                    // photo, a phone snap. Cropping to the card's own ratio
+                    // makes the listing read as one grid.
+                    aspectRatio: 16 / 9,
+                    // The card fixes the height; only the crop is wanted here.
+                    applyAspectRatioToLayout: false,
                   ),
                   if (closed)
                     Positioned.fill(

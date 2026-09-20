@@ -70,6 +70,9 @@ export async function priceOrder(customerId: string, input: QuoteInput): Promise
   const products = await Product.find({
     _id: { $in: input.items.map((i) => i.productId) },
     vendor: vendor._id,
+    // An unapproved product is not purchasable, even if a stale cart still
+    // holds it — it drops out here and is reported as unavailable.
+    status: 'approved',
   });
   const productsById = new Map(products.map((p) => [String(p._id), toPricingProduct(p)]));
   const docsById = new Map(products.map((p) => [String(p._id), p]));

@@ -12,6 +12,7 @@ import 'package:saji/core/money.dart';
 import 'package:saji/core/network/image_upload_service.dart';
 import 'package:saji/core/result.dart';
 import 'package:saji/core/widgets/text_input_dialog.dart';
+import 'package:saji/features/admin/domain/admin_models.dart';
 import 'package:saji/features/admin/presentation/admin_controller.dart';
 import 'package:saji/features/admin/presentation/admin_image_field.dart';
 import 'package:saji/features/admin/presentation/admin_widgets.dart';
@@ -48,6 +49,12 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
   bool _isFeatured = false;
   bool _loaded = false;
   bool _saving = false;
+
+  /// The shop's login once looked up: null means "no account", which is what
+  /// makes the section offer "create" instead of "edit / delete".
+  VendorAccount? _account;
+  bool _accountLoading = false;
+  bool _accountLoaded = false;
 
   /// Field name -> message, for whichever values were rejected. Filled by
   /// [_validate] and again from the server's own validation response.
@@ -89,6 +96,19 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
     _location = vendor.location ?? LocationService.fallbackCenter;
     _isOpen = vendor.isOpen;
     _isFeatured = vendor.isFeatured;
+  }
+
+  /// Looks up whether this shop already has a login. Runs once per open.
+  Future<void> _loadAccount(String vendorId) async {
+    if (_accountLoaded || _accountLoading) return;
+    _accountLoading = true;
+    final result = await ref.read(adminRepositoryProvider).vendorAccount(vendorId);
+    if (!mounted) return;
+    setState(() {
+      _accountLoading = false;
+      _accountLoaded = true;
+      if (result case Ok(:final value)) _account = value;
+    });
   }
 
   void _close() => ref.read(editingVendorIdProvider.notifier).state = null;
@@ -177,6 +197,17 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.failureMessage(failure))),
         );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // An existing shop may already have a login; the section renders
+    // "create" or "edit / delete" depending on what comes back.
+    final vendorId = widget.vendorId;
+    if (vendorId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _loadAccount(vendorId));
     }
   }
 
@@ -368,22 +399,12 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
                 style: AppText.adminTable.copyWith(color: AppColors.textMuted),
               ),
               Gap.sm,
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => _createAccount(widget.vendorId!),
-                      icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
-                      label: Text(l10n.adminVendorAccountCreate),
-                    ),
-                  ),
-                  Gap.wSm,
-                  IconButton(
-                    tooltip: l10n.adminVendorAccountRevoke,
-                    icon: const Icon(Icons.person_remove_rounded, color: AppColors.danger),
-                    onPressed: () => _revokeAccount(widget.vendorId!),
-                  ),
-                ],
+              _AccountSection(
+                account: _account,
+                loading: _accountLoading || !_accountLoaded,
+                onCreate: () => _createAccount(widget.vendorId!),
+                onEdit: () => _editAccount(widget.vendorId!),
+                onRevoke: () => _revokeAccount(widget.vendorId!),
               ),
             ],
           ],
@@ -435,9 +456,59 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
     if (!mounted) return;
 
     switch (result) {
-      case Ok():
+      case Ok(:final value):
+        // Flip the section straight to edit/delete — the shop has a login now.
+        setState(() => _account = value);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.adminVendorAccountExists)),
+          SnackBar(content: Text(l10n.adminVendorAccountCreated)),
+        );
+      case Err(:final failure):
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.failureMessage(failure))),
+        );
+    }
+  }
+
+  /// Edits the existing login. The password field starts empty and is only
+  /// sent when filled, so saving a rename does not disturb the credentials
+  /// the shop is already using.
+  Future<void> _editAccount(String vendorId) async {
+    final l10n = context.l10n;
+    final account = _account;
+    if (account == null) return;
+
+    final values = await showTextInputDialog(
+      context: context,
+      title: l10n.adminVendorAccountEdit,
+      titleStyle: AppText.adminSubheading,
+      width: 360,
+      fields: [
+        TextInputSpec(name: 'fullName', label: l10n.authFullName, initialValue: account.fullName),
+        TextInputSpec(
+          name: 'phone',
+          label: l10n.authPhone,
+          initialValue: account.phone,
+          keyboardType: TextInputType.phone,
+        ),
+        // Blank means "leave the current password alone".
+        TextInputSpec(name: 'password', label: l10n.adminVendorAccountNewPassword),
+      ],
+    );
+    if (values == null || !mounted) return;
+
+    final result = await ref.read(adminRepositoryProvider).updateVendorAccount(
+          vendorId,
+          fullName: values['fullName'],
+          phone: values['phone'],
+          password: values['password'],
+        );
+    if (!mounted) return;
+
+    switch (result) {
+      case Ok(:final value):
+        setState(() => _account = value);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.adminVendorAccountUpdated)),
         );
       case Err(:final failure):
         ScaffoldMessenger.of(context).showSnackBar(
@@ -472,13 +543,119 @@ class _AdminVendorFormState extends ConsumerState<AdminVendorForm> {
 
     switch (result) {
       case Ok():
+        // Back to "no account" — the section offers create again.
+        setState(() => _account = null);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.adminVendorAccountNone)),
+          SnackBar(content: Text(l10n.adminVendorAccountRevoked)),
         );
       case Err(:final failure):
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.failureMessage(failure))),
         );
     }
+  }
+}
+
+/// The shop-login block: "create a login" when the shop has none, and the
+/// owner's name and phone with edit/delete once it does.
+class _AccountSection extends StatelessWidget {
+  const _AccountSection({
+    required this.account,
+    required this.loading,
+    required this.onCreate,
+    required this.onEdit,
+    required this.onRevoke,
+  });
+
+  final VendorAccount? account;
+  final bool loading;
+  final VoidCallback onCreate;
+  final VoidCallback onEdit;
+  final VoidCallback onRevoke;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
+    // Until the lookup lands, neither state is the truth — showing "create"
+    // here would invite an admin to make a second account for a shop that
+    // already has one.
+    if (loading) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
+        child: Center(
+          child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+        ),
+      );
+    }
+
+    final existing = account;
+    if (existing == null) {
+      return SizedBox(
+        width: double.infinity,
+        child: OutlinedButton.icon(
+          onPressed: onCreate,
+          icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
+          label: Text(l10n.adminVendorAccountCreate),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          decoration: const BoxDecoration(
+            color: AppColors.searchFill,
+            borderRadius: AppRadius.mediumBorder,
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.verified_user_rounded, size: 18, color: AppColors.primaryGreen),
+              Gap.wSm,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      existing.fullName.isEmpty ? l10n.adminVendorAccountExists : existing.fullName,
+                      style: AppText.bodyStrong,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (existing.phone.isNotEmpty) ...[
+                      Gap.xs,
+                      Text(
+                        existing.phone,
+                        style: AppText.adminTable.copyWith(color: AppColors.textMuted),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        Gap.sm,
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: onEdit,
+                icon: const Icon(Icons.edit_rounded, size: 18),
+                label: Text(l10n.adminVendorAccountEdit),
+              ),
+            ),
+            Gap.wSm,
+            IconButton(
+              tooltip: l10n.adminVendorAccountRevoke,
+              icon: const Icon(Icons.person_remove_rounded, color: AppColors.danger),
+              onPressed: onRevoke,
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }

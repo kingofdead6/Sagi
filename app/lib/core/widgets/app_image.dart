@@ -15,6 +15,8 @@ class AppImage extends StatelessWidget {
     this.fit = BoxFit.cover,
     this.fallbackIcon = Icons.storefront_rounded,
     this.transformWidth = 684,
+    this.aspectRatio,
+    this.applyAspectRatioToLayout = true,
   });
 
   final ImageRef? image;
@@ -25,27 +27,64 @@ class AppImage extends StatelessWidget {
   final IconData fallbackIcon;
   final int transformWidth;
 
+  /// Width / height. When set, the image is cropped by Cloudinary to exactly
+  /// this shape, so a row or grid of them is uniform regardless of what was
+  /// uploaded.
+  final double? aspectRatio;
+
+  /// Whether to also reserve a box of [aspectRatio] in the layout, so the
+  /// slot holds its shape before the image loads and when there is none.
+  ///
+  /// Turn this off where the parent already dictates the size — a
+  /// `StackFit.expand` stack or a fixed-height header — since sizing it here
+  /// too would fight that parent.
+  final bool applyAspectRatioToLayout;
+
   @override
   Widget build(BuildContext context) {
-    final child = image == null
-        ? _fallback()
-        : CachedNetworkImage(
-            imageUrl: image!.cardUrl(transformWidth),
-            width: width,
-            height: height,
-            fit: fit,
-            fadeInDuration: AppDurations.fast,
-            placeholder: (context, url) => _Placeholder(blurUrl: image!.blurUrl, fit: fit),
-            errorWidget: (context, url, error) => _fallback(),
-          );
+    final ratio = aspectRatio;
 
-    if (radius == 0) return child;
-    return ClipRRect(borderRadius: BorderRadius.circular(radius), child: child);
+    final resolvedUrl = image == null
+        ? null
+        : ratio == null
+            ? image!.cardUrl(transformWidth)
+            : image!.uniformUrl(
+                width: transformWidth,
+                height: (transformWidth / ratio).round(),
+              );
+
+    var child = resolvedUrl == null
+        ? _fallback()
+        : _networkImage(resolvedUrl);
+
+    if (radius != 0) {
+      child = ClipRRect(borderRadius: BorderRadius.circular(radius), child: child);
+    }
+
+    // Hold the shape even while loading or when there is no image at all, so
+    // an item without a photo still lines up with the ones that have one.
+    if (ratio != null && height == null && applyAspectRatioToLayout) {
+      child = AspectRatio(aspectRatio: ratio, child: child);
+    }
+
+    return child;
   }
+
+  Widget _networkImage(String url) => CachedNetworkImage(
+        imageUrl: url,
+        width: width,
+        height: height,
+        fit: fit,
+        fadeInDuration: AppDurations.fast,
+        placeholder: (context, _) => _Placeholder(blurUrl: image!.blurUrl, fit: fit),
+        errorWidget: (context, _, error) => _fallback(),
+      );
 
   Widget _fallback() => SizedBox(
         width: width,
-        height: height,
+        // When the AspectRatio wrapper is in play it sets the height; forcing
+        // it here too would fight that and over-constrain the box.
+        height: (aspectRatio != null && applyAspectRatioToLayout) ? null : height,
         child: ColoredBox(
           color: AppColors.searchFill,
           child: Center(

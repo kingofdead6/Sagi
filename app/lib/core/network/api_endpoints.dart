@@ -96,6 +96,8 @@ abstract final class Api {
   static String adminSection(String id) => '$prefix/admin/sections/$id';
   static const adminProducts = '$prefix/admin/products';
   static String adminProduct(String id) => '$prefix/admin/products/$id';
+  /// Approve or reject a product a shop submitted for review.
+  static String adminProductStatus(String id) => '$prefix/admin/products/$id/status';
   static const adminProductsReorder = '$prefix/admin/products/reorder';
   static const adminProductsAvailability = '$prefix/admin/products/availability';
   static const adminOffers = '$prefix/admin/offers';

@@ -388,6 +388,8 @@ class _ProductRow extends ConsumerWidget {
             height: 56,
             radius: AppRadius.small,
             fallbackIcon: Icons.fastfood_rounded,
+            transformWidth: 160,
+            aspectRatio: 1,
           ),
           Gap.wMd,
           Expanded(
@@ -402,6 +404,24 @@ class _ProductRow extends ConsumerWidget {
                 ),
                 Gap.xs,
                 Text(product.priceCentimes.format(), style: AppText.metaStrong),
+                // A shop's own product is not public until an admin approves
+                // it, so say where it stands rather than leaving the owner to
+                // wonder why customers cannot see it.
+                if (product.isPending) ...[
+                  Gap.xs,
+                  Text(
+                    l10n.portalProductPending,
+                    style: AppText.meta.copyWith(color: AppColors.warning),
+                  ),
+                ] else if (product.isRejected) ...[
+                  Gap.xs,
+                  Text(
+                    product.rejectionReason?.isNotEmpty ?? false
+                        ? '${l10n.portalProductRejected}: ${product.rejectionReason}'
+                        : l10n.portalProductRejected,
+                    style: AppText.meta.copyWith(color: AppColors.danger),
+                  ),
+                ],
                 if (!product.isAvailable) ...[
                   Gap.xs,
                   Text(

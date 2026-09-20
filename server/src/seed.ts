@@ -358,6 +358,8 @@ async function seed() {
           description: item.description,
           priceCentimes: item.price * 100,
           sortOrder: order++,
+          // Seed data represents an already-reviewed catalogue.
+          status: 'approved',
           options: (item.options ?? []).map((o) => ({
             name: o.name,
             type: o.type,

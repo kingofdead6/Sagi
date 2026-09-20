@@ -72,6 +72,9 @@ class ProductTile extends StatelessWidget {
                 radius: AppRadius.medium,
                 fallbackIcon: Icons.restaurant_rounded,
                 transformWidth: 200,
+                // Square crop: every menu thumbnail is the same shape, so a
+                // tall photo no longer arrives letterboxed inside the box.
+                aspectRatio: 1,
               ),
               if (trailing != null) ...[Gap.wSm, trailing!],
             ],

@@ -2692,6 +2692,120 @@ abstract class AppLocalizations {
   /// **'حذف الحساب'**
   String get adminVendorAccountRevoke;
 
+  /// No description provided for @adminVendorAccountEdit.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعديل الحساب'**
+  String get adminVendorAccountEdit;
+
+  /// No description provided for @adminVendorAccountNewPassword.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة مرور جديدة (اتركها فارغة للإبقاء عليها)'**
+  String get adminVendorAccountNewPassword;
+
+  /// No description provided for @adminVendorAccountCreated.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم إنشاء حساب الدخول'**
+  String get adminVendorAccountCreated;
+
+  /// No description provided for @adminVendorAccountUpdated.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم تحديث الحساب'**
+  String get adminVendorAccountUpdated;
+
+  /// No description provided for @adminVendorAccountRevoked.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم حذف الحساب'**
+  String get adminVendorAccountRevoked;
+
+  /// No description provided for @adminProductStatusPending.
+  ///
+  /// In ar, this message translates to:
+  /// **'في انتظار المراجعة'**
+  String get adminProductStatusPending;
+
+  /// No description provided for @adminProductStatusApproved.
+  ///
+  /// In ar, this message translates to:
+  /// **'منشور'**
+  String get adminProductStatusApproved;
+
+  /// No description provided for @adminProductStatusRejected.
+  ///
+  /// In ar, this message translates to:
+  /// **'مرفوض'**
+  String get adminProductStatusRejected;
+
+  /// No description provided for @adminProductApprove.
+  ///
+  /// In ar, this message translates to:
+  /// **'موافقة'**
+  String get adminProductApprove;
+
+  /// No description provided for @adminProductReject.
+  ///
+  /// In ar, this message translates to:
+  /// **'رفض'**
+  String get adminProductReject;
+
+  /// No description provided for @adminProductRejectReason.
+  ///
+  /// In ar, this message translates to:
+  /// **'سبب الرفض'**
+  String get adminProductRejectReason;
+
+  /// No description provided for @adminProductApproved.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم نشر المنتج'**
+  String get adminProductApproved;
+
+  /// No description provided for @adminProductRejected.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم رفض المنتج'**
+  String get adminProductRejected;
+
+  /// No description provided for @adminProductsPendingFilter.
+  ///
+  /// In ar, this message translates to:
+  /// **'في انتظار المراجعة'**
+  String get adminProductsPendingFilter;
+
+  /// No description provided for @adminProductsAllFilter.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل المنتجات'**
+  String get adminProductsAllFilter;
+
+  /// No description provided for @portalProductPending.
+  ///
+  /// In ar, this message translates to:
+  /// **'في انتظار مراجعة الإدارة'**
+  String get portalProductPending;
+
+  /// No description provided for @portalProductRejected.
+  ///
+  /// In ar, this message translates to:
+  /// **'مرفوض'**
+  String get portalProductRejected;
+
+  /// No description provided for @portalProductSubmitted.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم الإرسال للمراجعة'**
+  String get portalProductSubmitted;
+
+  /// No description provided for @portalProductPendingHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'يظهر للزبائن بعد موافقة الإدارة'**
+  String get portalProductPendingHint;
+
   /// No description provided for @adminInvalidName.
   ///
   /// In ar, this message translates to:

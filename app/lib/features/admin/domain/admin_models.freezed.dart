@@ -2005,6 +2005,278 @@ as bool,
 
 
 /// @nodoc
+mixin _$VendorAccount {
+
+ String get id; String get fullName; String get phone;@NullableDateConverter() DateTime? get createdAt;
+/// Create a copy of VendorAccount
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$VendorAccountCopyWith<VendorAccount> get copyWith => _$VendorAccountCopyWithImpl<VendorAccount>(this as VendorAccount, _$identity);
+
+  /// Serializes this VendorAccount to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is VendorAccount&&(identical(other.id, id) || other.id == id)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,fullName,phone,createdAt);
+
+@override
+String toString() {
+  return 'VendorAccount(id: $id, fullName: $fullName, phone: $phone, createdAt: $createdAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $VendorAccountCopyWith<$Res>  {
+  factory $VendorAccountCopyWith(VendorAccount value, $Res Function(VendorAccount) _then) = _$VendorAccountCopyWithImpl;
+@useResult
+$Res call({
+ String id, String fullName, String phone,@NullableDateConverter() DateTime? createdAt
+});
+
+
+
+
+}
+/// @nodoc
+class _$VendorAccountCopyWithImpl<$Res>
+    implements $VendorAccountCopyWith<$Res> {
+  _$VendorAccountCopyWithImpl(this._self, this._then);
+
+  final VendorAccount _self;
+  final $Res Function(VendorAccount) _then;
+
+/// Create a copy of VendorAccount
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? fullName = null,Object? phone = null,Object? createdAt = freezed,}) {
+  return _then(VendorAccount(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
+as String,phone: null == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
+as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [VendorAccount].
+extension VendorAccountPatterns on VendorAccount {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _VendorAccount value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _VendorAccount() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _VendorAccount value)  $default,){
+final _that = this;
+switch (_that) {
+case _VendorAccount():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _VendorAccount value)?  $default,){
+final _that = this;
+switch (_that) {
+case _VendorAccount() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String fullName,  String phone, @NullableDateConverter()  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _VendorAccount() when $default != null:
+return $default(_that.id,_that.fullName,_that.phone,_that.createdAt);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String fullName,  String phone, @NullableDateConverter()  DateTime? createdAt)  $default,) {final _that = this;
+switch (_that) {
+case _VendorAccount():
+return $default(_that.id,_that.fullName,_that.phone,_that.createdAt);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String fullName,  String phone, @NullableDateConverter()  DateTime? createdAt)?  $default,) {final _that = this;
+switch (_that) {
+case _VendorAccount() when $default != null:
+return $default(_that.id,_that.fullName,_that.phone,_that.createdAt);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _VendorAccount implements VendorAccount {
+  const _VendorAccount({required this.id, this.fullName = '', this.phone = '', @NullableDateConverter() this.createdAt});
+  factory _VendorAccount.fromJson(Map<String, dynamic> json) => _$VendorAccountFromJson(json);
+
+@override final  String id;
+@override@JsonKey() final  String fullName;
+@override@JsonKey() final  String phone;
+@override@NullableDateConverter() final  DateTime? createdAt;
+
+/// Create a copy of VendorAccount
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$VendorAccountCopyWith<_VendorAccount> get copyWith => __$VendorAccountCopyWithImpl<_VendorAccount>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$VendorAccountToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VendorAccount&&(identical(other.id, id) || other.id == id)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,fullName,phone,createdAt);
+
+@override
+String toString() {
+  return 'VendorAccount(id: $id, fullName: $fullName, phone: $phone, createdAt: $createdAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$VendorAccountCopyWith<$Res> implements $VendorAccountCopyWith<$Res> {
+  factory _$VendorAccountCopyWith(_VendorAccount value, $Res Function(_VendorAccount) _then) = __$VendorAccountCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String fullName, String phone,@NullableDateConverter() DateTime? createdAt
+});
+
+
+
+
+}
+/// @nodoc
+class __$VendorAccountCopyWithImpl<$Res>
+    implements _$VendorAccountCopyWith<$Res> {
+  __$VendorAccountCopyWithImpl(this._self, this._then);
+
+  final _VendorAccount _self;
+  final $Res Function(_VendorAccount) _then;
+
+/// Create a copy of VendorAccount
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? fullName = null,Object? phone = null,Object? createdAt = freezed,}) {
+  return _then(_VendorAccount(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
+as String,phone: null == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
+as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
 mixin _$ManagedUser {
 
  String get id; String get fullName; String get phone; bool get isActive; bool get isBlocked; int get points; bool get isOnline;@NullableDateConverter() DateTime? get createdAt;

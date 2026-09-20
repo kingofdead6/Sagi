@@ -72,6 +72,10 @@ _Product _$ProductFromJson(Map<String, dynamic> json) => _Product(
           ?.map((e) => ProductOption.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const <ProductOption>[],
+  status:
+      $enumDecodeNullable(_$ProductStatusEnumMap, json['status']) ??
+      ProductStatus.approved,
+  rejectionReason: json['rejectionReason'] as String?,
 );
 
 Map<String, dynamic> _$ProductToJson(_Product instance) => <String, dynamic>{
@@ -85,4 +89,12 @@ Map<String, dynamic> _$ProductToJson(_Product instance) => <String, dynamic>{
   'isAvailable': instance.isAvailable,
   'sortOrder': instance.sortOrder,
   'options': instance.options,
+  'status': _$ProductStatusEnumMap[instance.status]!,
+  'rejectionReason': instance.rejectionReason,
+};
+
+const _$ProductStatusEnumMap = {
+  ProductStatus.pending: 'pending',
+  ProductStatus.approved: 'approved',
+  ProductStatus.rejected: 'rejected',
 };

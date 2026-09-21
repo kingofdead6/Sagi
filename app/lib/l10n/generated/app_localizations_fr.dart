@@ -1372,7 +1372,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get adminVendorAccountEdit => 'Modifier le compte';
 
   @override
-  String get adminVendorAccountNewPassword => 'Nouveau mot de passe (laisser vide pour conserver)';
+  String get adminVendorAccountNewPassword =>
+      'Nouveau mot de passe (laisser vide pour conserver)';
 
   @override
   String get adminVendorAccountCreated => 'Accès créé';
@@ -1414,7 +1415,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get adminProductsAllFilter => 'Tous les produits';
 
   @override
-  String get portalProductPending => 'En attente de validation de l\'administrateur';
+  String get portalProductPending =>
+      'En attente de validation de l\'administrateur';
 
   @override
   String get portalProductRejected => 'Refusé';
@@ -1423,7 +1425,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get portalProductSubmitted => 'Envoyé pour validation';
 
   @override
-  String get portalProductPendingHint => 'Il apparaît aux clients une fois validé par l\'administrateur';
+  String get portalProductPendingHint =>
+      'Il apparaît aux clients une fois validé par l\'administrateur';
 
   @override
   String get adminInvalidName =>

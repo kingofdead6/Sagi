@@ -1363,7 +1363,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminVendorAccountEdit => 'Edit the account';
 
   @override
-  String get adminVendorAccountNewPassword => 'New password (leave blank to keep)';
+  String get adminVendorAccountNewPassword =>
+      'New password (leave blank to keep)';
 
   @override
   String get adminVendorAccountCreated => 'Login created';
@@ -1414,7 +1415,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get portalProductSubmitted => 'Sent for review';
 
   @override
-  String get portalProductPendingHint => 'It appears to customers once an admin approves it';
+  String get portalProductPendingHint =>
+      'It appears to customers once an admin approves it';
 
   @override
   String get adminInvalidName => 'The name must be at least two characters';

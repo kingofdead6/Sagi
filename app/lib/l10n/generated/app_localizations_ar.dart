@@ -1355,7 +1355,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adminVendorAccountEdit => 'تعديل الحساب';
 
   @override
-  String get adminVendorAccountNewPassword => 'كلمة مرور جديدة (اتركها فارغة للإبقاء عليها)';
+  String get adminVendorAccountNewPassword =>
+      'كلمة مرور جديدة (اتركها فارغة للإبقاء عليها)';
 
   @override
   String get adminVendorAccountCreated => 'تم إنشاء حساب الدخول';

@@ -9,8 +9,8 @@ The full Saji experience in the browser, talking to the same `/api/v1` backend a
 | | `/orders`, `/orders/:id` | Active and past orders, live tracking (status stepper + driver on the map over Socket.IO), timeline, cancel while pending, rate store and driver, order again |
 | | `/account` | Profile, points, addresses, vouchers, password, browser notifications and sound, language, support |
 | Delivery agent | `/driver` | Go online/offline, live delivery requests with countdown, accept/decline with a reason, active delivery map and directions, slide-to-confirm pickup → on the way → delivered (cash confirmation required), GPS sharing, stats and history |
-| Shop owner | `/portal` | Open/close the shop, manage sections, add/edit products with photos and options, availability, drag to reorder. New products and edits show as *awaiting approval* until an admin publishes them |
-| Admin | `/admin` | Sent to the existing standalone admin panel (`web-admin/`) rather than duplicating it |
+| Shop owner | `/portal` | Open/close the shop, manage sections, add/edit products with photos and options, availability, drag (by the grip) to reorder. New products and edits show as *awaiting approval* until an admin publishes them. On phones, products and sections are two tabs and "new product" is a floating button |
+| Admin | `/admin/*` | The full admin panel (dashboard, orders with CSV export, categories, stores, products with approve/reject, offers, vouchers, drivers, customers, analytics, settings). Sidebar on desktop, top bar + slide-in menu on phones; tables turn into cards below `md`. Arabic-only, like the original `web-admin/` |
 
 Arabic (RTL, default), French and English, matching the app.
 
@@ -26,7 +26,6 @@ npm run build          # static output in dist/
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `VITE_API_URL` | `https://sagi-h2du.onrender.com` | Backend base URL (no `/api/v1`) |
-| `VITE_ADMIN_URL` | `http://localhost:5174` | Where admins are sent |
 
 The build is a static single-page app: on any host, rewrite unknown paths to `index.html` so deep links like `/orders/…` work on refresh. The API must allow the site's origin in `CORS_ORIGINS` (the default `*` already does).
 
@@ -38,6 +37,7 @@ src/
   state/      language/RTL, session, cart, toasts, location
   components/ UI kit, layout, catalog cards, product modal, maps, animated effects
   pages/      one file per screen; Driver and Portal are the two staff hubs
+  admin/      the admin panel (its own shell, UI kit and pages), mounted at /admin
   i18n/       ar / fr / en — identical keys
 ```
 

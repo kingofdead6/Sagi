@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 export const API_URL = (import.meta.env.VITE_API_URL || 'https://sagi-h2du.onrender.com').replace(/\/$/, '');
-export const ADMIN_URL = import.meta.env.VITE_ADMIN_URL || 'http://localhost:5174';
 const PREFIX = '/api/v1';
 
 const SESSION_KEY = 'saji.session';

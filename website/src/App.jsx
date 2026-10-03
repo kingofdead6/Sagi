@@ -19,7 +19,7 @@ const Login = lazy(() => import('./pages/Auth').then((m) => ({ default: m.Login 
 const Register = lazy(() => import('./pages/Auth').then((m) => ({ default: m.Register })));
 const Driver = lazy(() => import('./pages/Driver'));
 const Portal = lazy(() => import('./pages/Portal'));
-const AdminGate = lazy(() => import('./pages/AdminGate'));
+const AdminApp = lazy(() => import('./admin/AdminApp'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 /** Signed-in only; optionally limited to some roles (others go to their own home). */
@@ -62,16 +62,18 @@ function Loading() {
 
 export default function App() {
   const location = useLocation();
-  // Hubs with their own tabs (account, driver, portal) key on their root so a
-  // tab switch inside them does not replay the whole-page transition.
+  // Hubs with their own tabs (account, driver, portal, admin) key on their root
+  // so a tab switch inside them does not replay the whole-page transition.
   const segments = location.pathname.split('/');
-  const key = ['account', 'driver', 'portal'].includes(segments[1])
+  // The admin panel brings its own frame (sidebar / mobile top bar).
+  const isAdmin = segments[1] === 'admin';
+  const key = ['account', 'driver', 'portal', 'admin'].includes(segments[1])
     ? `/${segments[1]}`
     : segments.slice(0, 3).join('/');
   return (
     <MotionConfig reducedMotion="user">
       <ScrollToTop />
-      <Navbar />
+      {!isAdmin && <Navbar />}
       <Suspense fallback={<Loading />}>
         <AnimatePresence mode="wait">
           <Routes location={location} key={key}>
@@ -87,12 +89,12 @@ export default function App() {
             <Route path="/register" element={<Page><Register /></Page>} />
             <Route path="/driver/*" element={<Guard roles={['agent']}><Page><Driver /></Page></Guard>} />
             <Route path="/portal/*" element={<Guard roles={['vendor']}><Page><Portal /></Page></Guard>} />
-            <Route path="/admin" element={<Guard roles={['admin']}><Page><AdminGate /></Page></Guard>} />
+            <Route path="/admin/*" element={<Guard roles={['admin']}><Page><AdminApp /></Page></Guard>} />
             <Route path="*" element={<Page><NotFound /></Page>} />
           </Routes>
         </AnimatePresence>
       </Suspense>
-      <Footer />
+      {!isAdmin && <Footer />}
       <TabBar />
       <CartDrawer />
       <FlyLayer />

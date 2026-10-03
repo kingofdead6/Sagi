@@ -5,7 +5,6 @@ import { Icon } from './Icon';
 import { useAuth } from '../state/auth';
 import { useCart } from '../state/cart';
 import { LANGUAGES, useI18n } from '../state/i18n';
-import { ADMIN_URL } from '../lib/api';
 import { FACEBOOK_URL, INSTAGRAM_URL, PHONE_DISPLAY, PHONE_TEL, PLAY_STORE_URL } from '../lib/contact';
 
 export function Logo({ className = 'h-11' }) {
@@ -397,4 +396,3 @@ export function useGo() {
   return useNavigate();
 }
 
-export { ADMIN_URL };

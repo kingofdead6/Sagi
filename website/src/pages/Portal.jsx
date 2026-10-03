@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
-import { AnimatePresence, Reorder, motion } from 'framer-motion';
+import { AnimatePresence, Reorder, motion, useDragControls } from 'framer-motion';
 import { Icon } from '../components/Icon';
 import { Badge, Button, Confirm, EmptyState, ErrorState, Field, IconButton, Img, Input, Modal, Segmented, Skeleton, Spinner, Switch, Textarea } from '../components/ui';
 import { useI18n } from '../state/i18n';
@@ -135,7 +135,7 @@ function OptionsEditor({ options, onChange }) {
             exit={{ opacity: 0, height: 0 }}
             className="mb-3 overflow-hidden rounded-3xl border border-ink/10 bg-cream/50"
           >
-            <div className="space-y-3 p-4">
+            <div className="space-y-3 p-3 sm:p-4">
               <div className="flex gap-2">
                 <Input value={o.name} onChange={(e) => update(o.key, { name: e.target.value })} placeholder={t('portal.optionName')} maxLength={60} />
                 <IconButton icon="trash" label={t('common.delete')} variant="ghost" className="!text-tomato" onClick={() => onChange(options.filter((x) => x.key !== o.key))} />
@@ -161,7 +161,7 @@ function OptionsEditor({ options, onChange }) {
                     value={v.delta}
                     onChange={(e) => update(o.key, { values: o.values.map((x) => (x.key === v.key ? { ...x, delta: e.target.value } : x)) })}
                     placeholder={t('portal.valueDelta')}
-                    className="num w-28"
+                    className="num w-24 shrink-0 sm:w-28"
                     dir="ltr"
                   />
                   <IconButton
@@ -240,16 +240,16 @@ function ProductEditor({ open, product, sections, onClose, onSaved }) {
       title={product ? t('portal.productEdit') : t('portal.productNew')}
       footer={<Button size="lg" className="w-full" loading={busy} onClick={save} icon="send">{product ? t('common.save') : t('portal.submitted')}</Button>}
     >
-      <div className="space-y-5 p-6">
+      <div className="space-y-5 p-4 sm:p-6">
         <p className="flex items-start gap-2 rounded-2xl bg-tangerine-soft p-3 text-sm font-bold text-tangerine">
           <Icon name="info" className="h-5 w-5 shrink-0" /> {t('portal.reviewNotice')}
         </p>
         {product?.status === 'rejected' && product.rejectionReason && (
           <p className="rounded-2xl bg-red-50 p-3 text-sm font-bold text-tomato">{t('portal.rejectedWhy', { reason: product.rejectionReason })}</p>
         )}
-        <div className="flex flex-col gap-5 sm:flex-row">
+        <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-start">
           <ImagePicker image={form.image} onChange={(image) => setForm((f) => ({ ...f, image }))} />
-          <div className="flex-1 space-y-4">
+          <div className="w-full flex-1 space-y-4">
             <Field label={t('portal.name')} error={tried && !form.name.trim() ? t('portal.invalid') : null}>
               <Input value={form.name} onChange={set('name')} maxLength={80} invalid={tried && !form.name.trim()} />
             </Field>
@@ -329,7 +329,7 @@ function Sections({ sections, onChanged }) {
   };
 
   return (
-    <section className="card p-5">
+    <section className="card p-4 sm:p-5">
       <h2 className="mb-4 text-xl font-bold">{t('portal.sections')}</h2>
       <form onSubmit={add} className="mb-4 flex gap-2">
         <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t('portal.sectionName')} maxLength={60} />
@@ -384,35 +384,74 @@ function Sections({ sections, onChanged }) {
   );
 }
 
-function ProductRow({ product, section, onEdit, onDelete, onToggle }) {
+function ProductRow({ product, section, onEdit, onDelete, onToggle, onGrip }) {
   const { t, lang } = useI18n();
+  const actions = (
+    <>
+      <IconButton icon="pencil" label={t('common.edit')} variant="ghost" onClick={() => onEdit(product)} />
+      <IconButton icon="trash" label={t('common.delete')} variant="ghost" className="!text-tomato" onClick={() => onDelete(product)} />
+    </>
+  );
   return (
-    <div className="flex items-center gap-3 rounded-3xl bg-white p-3 shadow-card">
-      <span className="cursor-grab px-1 text-ink/30 active:cursor-grabbing" aria-hidden="true">
-        <Icon name="grip" className="h-5 w-5" strokeWidth={3} />
-      </span>
-      <Img image={product.image} ratio={1} width={140} className="h-16 w-16 shrink-0 rounded-2xl" fallback="burger" />
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="truncate font-bold">{product.name}</p>
-          <Badge tone={STATUS_TONE[product.status] ?? 'ink'} pulse={product.status === 'pending'}>{t(`portal.${product.status ?? 'approved'}`)}</Badge>
-        </div>
-        <p className="num text-sm text-ink-muted">
-          {money(product.priceCentimes, lang)}
-          {section && ` · ${section.name}`}
-          {product.options?.length > 0 && ` · ${product.options.length} ${t('portal.options')}`}
-        </p>
-        {product.status === 'rejected' && product.rejectionReason && (
-          <p className="line-clamp-1 text-xs font-bold text-tomato">{t('portal.rejectedWhy', { reason: product.rejectionReason })}</p>
+    <div className="rounded-3xl bg-white p-3 shadow-card">
+      <div className="flex items-center gap-3">
+        {onGrip && (
+          // Only the grip starts a drag, so a finger on the rest of the card
+          // still scrolls the page on phones.
+          <span
+            onPointerDown={onGrip}
+            className="-ms-1 grid cursor-grab touch-none select-none place-items-center self-stretch px-1 text-ink/30 active:cursor-grabbing"
+            aria-hidden="true"
+          >
+            <Icon name="grip" className="h-5 w-5" strokeWidth={3} />
+          </span>
         )}
-        {product.status === 'pending' && <p className="text-xs text-ink-muted">{t('portal.pendingHint')}</p>}
+        <Img image={product.image} ratio={1} width={140} className="h-16 w-16 shrink-0 rounded-2xl" fallback="burger" />
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <p className="line-clamp-2 break-words font-bold sm:truncate">{product.name}</p>
+            <Badge tone={STATUS_TONE[product.status] ?? 'ink'} pulse={product.status === 'pending'}>{t(`portal.${product.status ?? 'approved'}`)}</Badge>
+          </div>
+          <p className="num text-sm text-ink-muted">
+            {money(product.priceCentimes, lang)}
+            {section && ` · ${section.name}`}
+            {product.options?.length > 0 && ` · ${product.options.length} ${t('portal.options')}`}
+          </p>
+          {product.status === 'rejected' && product.rejectionReason && (
+            <p className="line-clamp-2 text-xs font-bold text-tomato sm:line-clamp-1">{t('portal.rejectedWhy', { reason: product.rejectionReason })}</p>
+          )}
+          {product.status === 'pending' && <p className="text-xs text-ink-muted">{t('portal.pendingHint')}</p>}
+        </div>
+        <div className="hidden shrink-0 items-center gap-1 sm:flex">
+          <Switch checked={product.isAvailable} onChange={() => onToggle(product)} label={t('portal.available')} />
+          {actions}
+        </div>
       </div>
-      <div className="flex shrink-0 items-center gap-1">
-        <Switch checked={product.isAvailable} onChange={() => onToggle(product)} label={t('portal.available')} />
-        <IconButton icon="pencil" label={t('common.edit')} variant="ghost" onClick={() => onEdit(product)} />
-        <IconButton icon="trash" label={t('common.delete')} variant="ghost" className="!text-tomato" onClick={() => onDelete(product)} />
+      <div className="mt-2 flex items-center justify-between border-t border-ink/5 pt-2 sm:hidden">
+        <label className="flex items-center gap-2 text-sm font-bold text-ink-soft">
+          <Switch checked={product.isAvailable} onChange={() => onToggle(product)} label={t('portal.available')} />
+          {product.isAvailable ? t('portal.available') : t('portal.unavailable')}
+        </label>
+        <div className="flex items-center gap-1">{actions}</div>
       </div>
     </div>
+  );
+}
+
+/** A reorderable row whose drag starts from the grip only. */
+function DraggableProduct({ product, onDrop, ...rowProps }) {
+  const controls = useDragControls();
+  return (
+    <Reorder.Item
+      value={product}
+      dragListener={false}
+      dragControls={controls}
+      onDragEnd={onDrop}
+      whileDrag={{ scale: 1.03, boxShadow: '0 24px 48px -16px rgba(14,77,43,.35)' }}
+      className="list-none rounded-3xl"
+    >
+      <ProductRow product={product} onGrip={(e) => controls.start(e)} {...rowProps} />
+    </Reorder.Item>
   );
 }
 
@@ -423,6 +462,8 @@ export default function Portal() {
   const sections = useAsync(() => portal.sections(), []);
   const products = useAsync(() => portal.products(), []);
   const [filter, setFilter] = useState('all');
+  // Phones show one pane at a time; from `lg` both sit side by side.
+  const [pane, setPane] = useState('products');
   const [editing, setEditing] = useState(undefined);
   const [deleting, setDeleting] = useState(null);
   const [togglingShop, setTogglingShop] = useState(false);
@@ -480,24 +521,24 @@ export default function Portal() {
 
   const s = shop.data;
   return (
-    <div className="container-x pb-12 pt-6">
+    <div className="container-x pb-28 pt-4 sm:pt-6 lg:pb-12">
       <motion.div
         layout
-        className={`relative overflow-hidden rounded-[2.5rem] p-6 text-white shadow-lift transition-colors duration-700 md:p-8 ${s?.isOpen ? 'bg-forest' : 'bg-ink-soft'}`}
+        className={`relative overflow-hidden rounded-[2rem] p-5 text-white sm:rounded-[2.5rem] sm:p-6 shadow-lift transition-colors duration-700 md:p-8 ${s?.isOpen ? 'bg-forest' : 'bg-ink-soft'}`}
       >
         {!s ? (
           <Skeleton className="h-20 bg-white/10" />
         ) : (
-          <div className="relative flex flex-wrap items-center gap-5">
-            <motion.div initial={{ scale: 0, rotate: -20 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 200, damping: 14 }} className="h-20 w-20 overflow-hidden rounded-3xl bg-white p-1.5">
+          <div className="relative flex flex-wrap items-center gap-4 sm:gap-5">
+            <motion.div initial={{ scale: 0, rotate: -20 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 200, damping: 14 }} className="h-16 w-16 shrink-0 overflow-hidden rounded-3xl bg-white p-1.5 sm:h-20 sm:w-20">
               <Img image={s.logo} ratio={1} width={160} className="h-full w-full rounded-2xl" fallback="store" />
             </motion.div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-bold text-white/70">{t('portal.title')}</p>
-              <h1 className="truncate text-3xl font-extrabold md:text-4xl">{s.name}</h1>
+              <h1 className="truncate text-2xl font-extrabold sm:text-3xl md:text-4xl">{s.name}</h1>
               <p className="text-sm text-white/80">{s.isOpen ? t('portal.openHint') : t('portal.closedHint')}</p>
             </div>
-            <div className="flex items-center gap-3 rounded-full bg-white/10 py-2 pe-2 ps-5 backdrop-blur">
+            <div className="flex w-full items-center justify-between gap-3 rounded-full bg-white/10 py-2 pe-2 ps-5 backdrop-blur sm:w-auto sm:justify-start">
               <span className="font-bold">{s.isOpen ? t('portal.open') : t('portal.closed')}</span>
               <Switch checked={s.isOpen} onChange={toggleShop} disabled={togglingShop} size="lg" label={t('portal.open')} />
             </div>
@@ -505,11 +546,21 @@ export default function Portal() {
         )}
       </motion.div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
-        <section>
+      <Segmented
+        className="mt-5 flex w-full lg:hidden"
+        value={pane}
+        onChange={setPane}
+        options={[
+          { value: 'products', label: t('portal.products'), icon: 'burger', badge: all.length },
+          { value: 'sections', label: t('portal.sections'), icon: 'menu', badge: sections.data?.length ?? 0 },
+        ]}
+      />
+
+      <div className="mt-5 grid gap-6 lg:mt-8 lg:grid-cols-[1fr_320px]">
+        <section className={`min-w-0 ${pane === 'products' ? '' : 'hidden lg:block'}`}>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-2xl font-extrabold">{t('portal.products')} <span className="num text-base text-ink-muted">({all.length})</span></h2>
-            <Button icon="plus" onClick={() => setEditing(null)}>{t('portal.productNew')}</Button>
+            <h2 className="text-xl font-extrabold sm:text-2xl">{t('portal.products')} <span className="num text-base text-ink-muted">({all.length})</span></h2>
+            <Button icon="plus" className="hidden sm:inline-flex" onClick={() => setEditing(null)}>{t('portal.productNew')}</Button>
           </div>
           <div className="scrollbar-none -mx-4 mb-4 overflow-x-auto px-4">
             <Segmented
@@ -533,9 +584,7 @@ export default function Portal() {
           ) : filter === 'all' ? (
             <Reorder.Group axis="y" values={all} onReorder={reorder} className="space-y-3">
               {all.map((p) => (
-                <Reorder.Item key={p.id} value={p} onDragEnd={persistOrder} whileDrag={{ scale: 1.03, boxShadow: '0 24px 48px -16px rgba(14,77,43,.35)' }} className="list-none rounded-3xl">
-                  <ProductRow product={p} section={sectionById.get(p.section?.id ?? p.section)} onEdit={setEditing} onDelete={setDeleting} onToggle={toggleProduct} />
-                </Reorder.Item>
+                <DraggableProduct key={p.id} product={p} onDrop={persistOrder} section={sectionById.get(p.section?.id ?? p.section)} onEdit={setEditing} onDelete={setDeleting} onToggle={toggleProduct} />
               ))}
             </Reorder.Group>
           ) : (
@@ -548,10 +597,30 @@ export default function Portal() {
             </div>
           )}
         </section>
-        <aside className="lg:sticky lg:top-24 lg:self-start">
+        <aside className={`min-w-0 lg:sticky lg:top-24 lg:block lg:self-start ${pane === 'sections' ? '' : 'hidden'}`}>
           {sections.loading ? <Skeleton className="h-64 rounded-3xl" /> : <Sections sections={sections.data ?? []} onChanged={() => { sections.reload(); products.reload(); }} />}
         </aside>
       </div>
+
+      {/* Thumb-reach "new product" on phones, where the header button is hidden. */}
+      <AnimatePresence>
+        {pane === 'products' && editing === undefined && (
+          <motion.button
+            type="button"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setEditing(null)}
+            aria-label={t('portal.productNew')}
+            className="fixed bottom-5 end-5 z-30 flex h-14 items-center gap-2 rounded-full bg-forest pe-5 ps-4 font-bold text-white shadow-lift sm:hidden"
+            style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
+          >
+            <Icon name="plus" className="h-6 w-6" />
+            {t('portal.productNew')}
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       <ProductEditor
         open={editing !== undefined}

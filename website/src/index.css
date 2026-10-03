@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
+  body {
+    @apply bg-cream font-sans text-ink antialiased;
+    /* Room for the phone's home indicator under the bottom tab bar. */
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  h1, h2, h3, h4 { @apply font-display; }
+  ::selection { @apply bg-leaf/30 text-forest-deep; }
+  :focus-visible { @apply outline-none ring-2 ring-leaf ring-offset-2 ring-offset-cream; }
+  input, textarea, select { @apply font-sans; }
+  /* Isolated so a number never reorders the words around it; the run still
+     follows the paragraph direction, so "450 دج" keeps the currency on the
+     correct side in Arabic. Digits themselves always render left-to-right. */
+  .num { unicode-bidi: isolate; font-variant-numeric: tabular-nums; }
+}
+
+@layer components {
+  .container-x { @apply mx-auto w-full max-w-7xl px-4 sm:px-6; }
+  .card { @apply rounded-3xl bg-white shadow-card; }
+  .field {
+    @apply w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 text-ink placeholder:text-ink-muted
+      transition focus:border-leaf focus:outline-none focus:ring-4 focus:ring-leaf/15;
+  }
+  .label { @apply mb-1.5 block text-sm font-bold text-ink-soft; }
+  .chip {
+    @apply inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white px-4 py-2 text-sm font-bold
+      text-ink-soft transition hover:border-leaf/50 hover:text-forest;
+  }
+  .chip-on { @apply border-forest bg-forest text-white hover:text-white; }
+  .skeleton { @apply relative overflow-hidden rounded-2xl bg-ink/[.06]; }
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/60 to-transparent;
+  }
+  [dir='rtl'] .skeleton::after { animation-direction: reverse; }
+  .scrollbar-none { scrollbar-width: none; }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+  /* The logo's speed lines, reused as a decorative motif. */
+  .speed-lines { background: repeating-linear-gradient(0deg, transparent 0 6px, currentColor 6px 9px, transparent 9px 16px); }
+}
+
+/* Leaflet ships its own stylesheet; these keep it inside the brand. */
+.leaflet-container { @apply font-sans; border-radius: inherit; }
+.leaflet-control-attribution { font-size: 10px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}

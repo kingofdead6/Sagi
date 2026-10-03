@@ -52,6 +52,20 @@ import {
   updateVoucherSchema,
 } from './admin.schema';
 
+/** Recursively renames Mongo `_id` to a string `id` and drops `__v`, like toJSON. */
+function withPublicIds(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(withPublicIds);
+  if (!value || typeof value !== 'object' || value instanceof Date) return value;
+  if (typeof (value as { toHexString?: unknown }).toHexString === 'function') return value;
+  const out: Record<string, unknown> = {};
+  for (const [key, v] of Object.entries(value as Record<string, unknown>)) {
+    if (key === '__v') continue;
+    if (key === '_id') out.id = String(v);
+    else out[key] = withPublicIds(v);
+  }
+  return out;
+}
+
 export const adminRouter = Router();
 adminRouter.use(requireAuth, requireRole('admin'));
 
@@ -538,17 +552,10 @@ adminRouter.get(
       Product.countDocuments(filter),
     ]);
     // Aggregate output is plain objects, so the schema's _id -> id transform
-    // never runs; map it here to keep the shape identical to every other
-    // product the API returns.
-    const items = docs.map((doc) => {
-      const { _id, __v, vendor, ...rest } = doc as Record<string, any>;
-      return {
-        ...rest,
-        id: String(_id),
-        vendor: vendor ? { ...vendor, id: String(vendor._id), _id: undefined } : vendor,
-      };
-    });
-    return ok(res, buildPage(items, page, limit, total));
+    // never runs — at any depth. Map it recursively so nested subdocuments
+    // (option values, the joined vendor) match what toJSON gives everywhere
+    // else; the apps parse option values by `id`.
+    return ok(res, buildPage(docs.map(withPublicIds), page, limit, total));
   }),
 );
 

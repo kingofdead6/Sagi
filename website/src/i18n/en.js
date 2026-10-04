@@ -149,7 +149,6 @@ export default {
     notLinked: "This account isn't linked to a store yet. Contact the admin.", reviewNotice: 'Every new product or edit is reviewed by an admin before it goes live.',
     total: '{n} products', filterAll: 'All', moveUp: 'Move up', moveDown: 'Move down', invalid: 'Fill in the required fields',
   },
-  admin: { title: 'Admin account', text: 'The full admin panel lives in the dedicated admin app.', open: 'Open the admin panel' },
   notFound: { title: 'Lost?', text: "This page doesn't exist. Let's get you home.", home: 'Home' },
   footer: { getItOn: 'Get it on', rights: 'All rights reserved', made: 'Made with love in Bir El Ater', links: 'Links', contact: 'Contact' },
 };

@@ -149,7 +149,6 @@ export default {
     notLinked: "Ce compte n'est relié à aucune boutique. Contactez l'administration.", reviewNotice: "Chaque nouveau produit ou modification est validé par l'administration avant publication.",
     total: '{n} produits', filterAll: 'Tous', moveUp: 'Monter', moveDown: 'Descendre', invalid: 'Complétez les champs obligatoires',
   },
-  admin: { title: 'Compte administrateur', text: "L'administration complète se trouve dans l'application d'administration dédiée.", open: "Ouvrir l'administration" },
   notFound: { title: 'Perdu ?', text: "Cette page n'existe pas. Retour à l'accueil.", home: 'Accueil' },
   footer: { getItOn: 'Disponible sur', rights: 'Tous droits réservés', made: 'Fait avec amour à Bir El Ater', links: 'Liens', contact: 'Contact' },
 };
